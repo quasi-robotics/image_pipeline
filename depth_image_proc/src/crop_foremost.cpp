@@ -97,7 +97,7 @@ void CropForemostNode::connectCb()
     sub_raw_ = image_transport::create_subscription(
       this, "image_raw",
       std::bind(&CropForemostNode::depthCb, this, std::placeholders::_1),
-      hints.getTransport());
+      hints.getTransport(), rmw_qos_profile_sensor_data);
   }
 }
 

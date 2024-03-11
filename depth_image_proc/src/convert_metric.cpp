@@ -92,7 +92,7 @@ void ConvertMetricNode::connectCb()
     sub_raw_ = image_transport::create_subscription(
       this, "image_raw",
       std::bind(&ConvertMetricNode::depthCb, this, std::placeholders::_1),
-      hints.getTransport());
+      hints.getTransport(), rmw_qos_profile_sensor_data);
   }
 }
 

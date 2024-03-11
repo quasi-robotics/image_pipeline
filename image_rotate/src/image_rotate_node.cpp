@@ -293,7 +293,7 @@ void ImageRotateNode::subscribe()
 {
   RCUTILS_LOG_DEBUG("Subscribing to image topic.");
   if (config_.use_camera_info && config_.input_frame_id.empty()) {
-    auto custom_qos = rmw_qos_profile_system_default;
+    auto custom_qos = rmw_qos_profile_sensor_data;
     custom_qos.depth = 3;
 
     cam_sub_ = image_transport::create_camera_subscription(
@@ -305,7 +305,7 @@ void ImageRotateNode::subscribe()
       "raw",
       custom_qos);
   } else {
-    auto custom_qos = rmw_qos_profile_system_default;
+    auto custom_qos = rmw_qos_profile_sensor_data;
     custom_qos.depth = 3;
     img_sub_ = image_transport::create_subscription(
       this,

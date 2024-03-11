@@ -123,7 +123,7 @@ void DisparityNode::connectCb()
     sub_info_.unsubscribe();
   } else if (!sub_depth_image_.getSubscriber()) {
     image_transport::TransportHints hints(this, "raw");
-    sub_depth_image_.subscribe(this, "left/image_rect", hints.getTransport());
+    sub_depth_image_.subscribe(this, "left/image_rect", hints.getTransport(), rmw_qos_profile_sensor_data);
     sub_info_.subscribe(this, "right/camera_info");
   }
 }
