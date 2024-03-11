@@ -103,11 +103,11 @@ PointCloudXyziNode::PointCloudXyziNode(const rclcpp::NodeOptions & options)
 
         // depth image can use different transport.(e.g. compressedDepth)
         image_transport::TransportHints depth_hints(this, "raw", "depth_image_transport");
-        sub_depth_.subscribe(this, depth_topic, depth_hints.getTransport());
+        sub_depth_.subscribe(this, depth_topic, depth_hints.getTransport(), rmw_qos_profile_sensor_data);
 
         // intensity uses normal ros transport hints.
         image_transport::TransportHints hints(this, "raw");
-        sub_intensity_.subscribe(this, intensity_topic, hints.getTransport());
+        sub_intensity_.subscribe(this, intensity_topic, hints.getTransport(), rmw_qos_profile_sensor_data);
         sub_info_.subscribe(this, intensity_info_topic);
       }
     };

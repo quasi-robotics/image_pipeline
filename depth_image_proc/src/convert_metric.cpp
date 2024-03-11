@@ -86,7 +86,7 @@ ConvertMetricNode::ConvertMetricNode(const rclcpp::NodeOptions & options)
         sub_raw_ = image_transport::create_subscription(
           this, topic,
           std::bind(&ConvertMetricNode::depthCb, this, std::placeholders::_1),
-          hints.getTransport());
+          hints.getTransport(), rmw_qos_profile_sensor_data);
       }
     };
   // For compressed topics to remap appropriately, we need to pass a

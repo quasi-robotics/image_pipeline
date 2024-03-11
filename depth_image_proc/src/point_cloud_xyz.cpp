@@ -77,7 +77,7 @@ PointCloudXyzNode::PointCloudXyzNode(const rclcpp::NodeOptions & options)
 
         // Get transport and QoS
         image_transport::TransportHints depth_hints(this, "raw", "depth_image_transport");
-        auto custom_qos = rmw_qos_profile_system_default;
+        auto custom_qos = rmw_qos_profile_sensor_data;
         custom_qos.depth = queue_size_;
 
         sub_depth_ = image_transport::create_camera_subscription(

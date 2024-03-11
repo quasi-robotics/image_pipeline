@@ -71,7 +71,7 @@ PointCloudXyzRadialNode::PointCloudXyzRadialNode(const rclcpp::NodeOptions & opt
         std::string topic = node_base->resolve_topic_or_service_name("depth/image_raw", false);
         // Get transport and QoS
         image_transport::TransportHints depth_hints(this, "raw", "depth_image_transport");
-        auto custom_qos = rmw_qos_profile_system_default;
+        auto custom_qos = rmw_qos_profile_sensor_data;
         custom_qos.depth = queue_size_;
         // Create subscriber
         sub_depth_ = image_transport::create_camera_subscription(
