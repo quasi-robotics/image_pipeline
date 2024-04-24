@@ -44,7 +44,7 @@ import sensor_msgs.msg
 import sys
 import tarfile
 import time
-from distutils.version import LooseVersion
+from semver import VersionInfo
 from enum import Enum
 
 # Supported camera models
@@ -1145,7 +1145,7 @@ class StereoCalibrator(Calibrator):
 
         if self.camera_model == CAMERA_MODEL.PINHOLE:
             print("stereo pinhole calibration...")
-            if LooseVersion(cv2.__version__).version[0] == 2:
+            if VersionInfo.parse(cv2.__version__).major < 3:
                 cv2.stereoCalibrate(opts, lipts, ripts, self.size,
                                    self.l.intrinsics, self.l.distortion,
                                    self.r.intrinsics, self.r.distortion,
@@ -1164,7 +1164,7 @@ class StereoCalibrator(Calibrator):
                                    flags = flags)
         elif self.camera_model == CAMERA_MODEL.FISHEYE:
             print("stereo fisheye calibration...")
-            if LooseVersion(cv2.__version__).version[0] == 2:
+            if VersionInfo.parse(cv2.__version__).major < 3:
                 print("ERROR: You need OpenCV >3 to use fisheye camera model")
                 sys.exit()
             else:
