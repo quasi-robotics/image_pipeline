@@ -2,6 +2,9 @@
 Changelog for package image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.0 (2024-05-27)
+------------------
+
 5.0.1 (2024-03-26)
 ------------------
 * DisparityNode: replace full_dp parameter with sgbm_mode (`#945 <https://github.com/ros-perception/image_pipeline/issues/945>`_)

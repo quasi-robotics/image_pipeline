@@ -2,6 +2,20 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.0 (2024-05-27)
+------------------
+* [rolling] image_publisher: Fix image, constantly flipping when static image is published (`#986 <https://github.com/ros-perception/image_pipeline/issues/986>`_)
+  Continuation of
+  https://github.com/ros-perception/image_pipeline/pull/984.
+  When publishing video stream from a camera, the image was flipped
+  correctly. Yet for a static image, which was loaded once, the flip
+  function was applied every time `ImagePublisher::doWork()` was called,
+  resulting in the published image being flipped back and forth all the
+  time.
+  This PR should be straightforward to port it to `Humble`, `Iron` and
+  `Jazzy`.
+* Contributors: Krzysztof Wojciechowski
+
 5.0.1 (2024-03-26)
 ------------------
 * unified changelog, add missing image, deduplicate tutorials (`#938 <https://github.com/ros-perception/image_pipeline/issues/938>`_)

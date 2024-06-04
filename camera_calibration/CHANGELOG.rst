@@ -2,6 +2,55 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.0 (2024-05-27)
+------------------
+* fix: cv2.aruco.interpolateCornersCharuco is deprecated (`#979 <https://github.com/ros-perception/image_pipeline/issues/979>`_)
+  There has been API Changes in the newer releases of opencv2 (from
+  4.8.0). The PR addresses this by supporting both the old and new APIs.
+  updated Syntax
+  ```
+  charucodetector = cv2.aruco.CharucoDetector(board)
+  charuco_corners, charuco_ids, marker_corners, marker_ids = charucodetector.detectBoard(image)
+  ```
+  before 4.8.0
+  ```
+  marker_corners, marker_ids, rejectedImgPoints = cv2.aruco.detectMarkers( image, dictionary)
+  retval, charuco_corners, charuco_ids = cv2.aruco.interpolateCornersCharuco( marker_corners, marker_ids, image, board)
+  ```
+  See the changed examples in the main opencv2 repo:
+  https://github.com/opencv/opencv/blob/f9a59f2592993d3dcc080e495f4f5e02dd8ec7ef/samples/python/calibrate.py#L110
+* Update for compatibility with image_pipeline 4.1.0 (`#968 <https://github.com/ros-perception/image_pipeline/issues/968>`_)
+  This is a PR to fix:
+  - `#966 <https://github.com/ros-perception/image_pipeline/issues/966>`_
+  As noted in `#966 <https://github.com/ros-perception/image_pipeline/issues/966>`_, as of writing image_pipeline [4.1.0 has been
+  released](https://github.com/ros-perception/vision_opencv/releases/tag/4.1.0),
+  is updated on
+  [index.ros.org](https://index.ros.org/p/image_geometry/github-ros-perception-vision_opencv/#rolling),
+  but it has not yet been migrated to
+  [packages.ros.org](http://packages.ros.org/ros2/ubuntu/dists/noble/main/binary-amd64/Packages).
+  As such `camera_calibration` will also require the source of
+  [image_pipeline
+  4.1.0](https://github.com/ros-perception/vision_opencv/releases/tag/4.1.0)
+  or higher to successfully build.
+  I tested to ensure successful build with colcon build & colcon test.
+  Note that colcon test has the following warning that is out of scope of
+  this PR:
+  ```
+  =============================== warnings summary ===============================
+  src/camera_calibration/calibrator.py:47
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+  ```
+  Please let me know if there are any questions, concerns, or requested
+  changes.
+* replace disutils with python3-semver (`#970 <https://github.com/ros-perception/image_pipeline/issues/970>`_)
+  Fix for
+  - `#969 <https://github.com/ros-perception/image_pipeline/issues/969>`_
+  I added a dependency for `python3-semver` to replace version parsing
+  with `disutils`.
+  Please let me know if you have any questions, concerns, or additional
+  requested changes.
+* Contributors: Földi Tamás, Scott Monaghan
+
 5.0.1 (2024-03-26)
 ------------------
 * Fix spelling error for cv2.aruco.DICT from 6x6_50 to 7x7_1000 (`#961 <https://github.com/ros-perception/image_pipeline/issues/961>`_)

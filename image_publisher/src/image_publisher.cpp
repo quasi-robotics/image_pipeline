@@ -31,7 +31,9 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
 #include <chrono>
+#include <limits>
 #include <string>
 #include <thread>
 #include <vector>
@@ -60,6 +62,7 @@ ImagePublisher::ImagePublisher(
   std::string topic_name = node_base->resolve_topic_or_service_name("image_raw", false);
   pub_ = image_transport::create_camera_publisher(this, topic_name);
 
+  field_of_view_ = this->declare_parameter("field_of_view", static_cast<double>(0));
   flip_horizontal_ = this->declare_parameter("flip_horizontal", false);
   flip_vertical_ = this->declare_parameter("flip_vertical", false);
   frame_id_ = this->declare_parameter("frame_id", std::string("camera"));
@@ -71,36 +74,48 @@ ImagePublisher::ImagePublisher(
   auto param_change_callback =
     [this](std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult
     {
+      bool call_init = false;
+      bool call_reconfigure = false;
+
       auto result = rcl_interfaces::msg::SetParametersResult();
       result.successful = true;
       for (auto parameter : parameters) {
         if (parameter.get_name() == "filename") {
           filename_ = parameter.as_string();
           RCLCPP_INFO(get_logger(), "Reset filename as '%s'", filename_.c_str());
-          ImagePublisher::onInit();
-          return result;
+          call_init = true;
+        } else if (parameter.get_name() == "field_of_view") {
+          field_of_view_ = parameter.as_double();
+          RCLCPP_INFO(get_logger(), "Reset field_of_view as '%f'", field_of_view_);
+          call_init = true;
         } else if (parameter.get_name() == "flip_horizontal") {
           flip_horizontal_ = parameter.as_bool();
           RCLCPP_INFO(get_logger(), "Reset flip_horizontal as '%d'", flip_horizontal_);
-          ImagePublisher::onInit();
-          return result;
+          call_init = true;
         } else if (parameter.get_name() == "flip_vertical") {
           flip_vertical_ = parameter.as_bool();
           RCLCPP_INFO(get_logger(), "Reset flip_vertical as '%d'", flip_vertical_);
-          ImagePublisher::onInit();
-          return result;
+          call_init = true;
         } else if (parameter.get_name() == "frame_id") {
           frame_id_ = parameter.as_string();
           RCLCPP_INFO(get_logger(), "Reset frame_id as '%s'", frame_id_.c_str());
         } else if (parameter.get_name() == "publish_rate") {
           publish_rate_ = parameter.as_double();
           RCLCPP_INFO(get_logger(), "Reset publish_rate as '%lf'", publish_rate_);
+          call_reconfigure = true;
         } else if (parameter.get_name() == "camera_info_url") {
           camera_info_url_ = parameter.as_string();
-          RCLCPP_INFO(get_logger(), "Reset camera_info_url as '%s'", camera_info_url_.c_str());
+          RCLCPP_INFO(get_logger(), "Reset camera_info_rul as '%s'", camera_info_url_.c_str());
+          call_reconfigure = true;
         }
       }
-      ImagePublisher::reconfigureCallback();
+      // reconfigureCallback() is called within onInit() so there is no need to call it twice
+      if (call_reconfigure && !call_init) {
+        ImagePublisher::reconfigureCallback();
+      } else if (call_init) {
+        ImagePublisher::onInit();
+      }
+
       return result;
     };
   on_set_parameters_callback_handle_ = this->add_on_set_parameters_callback(param_change_callback);
@@ -144,9 +159,11 @@ void ImagePublisher::doWork()
       if (!cap_.read(image_)) {
         cap_.set(cv::CAP_PROP_POS_FRAMES, 0);
       }
+      image_flipped_ = false;
     }
-    if (flip_image_) {
+    if (flip_image_ && !image_flipped_) {
       cv::flip(image_, image_, flip_value_);
+      image_flipped_ = true;
     }
 
     sensor_msgs::msg::Image::SharedPtr out_img =
@@ -213,20 +230,25 @@ void ImagePublisher::onInit()
   } else {
     flip_image_ = false;
   }
+  image_flipped_ = false;  // Image newly read, needs to be flipped
 
   camera_info_.width = image_.cols;
   camera_info_.height = image_.rows;
   camera_info_.distortion_model = "plumb_bob";
   camera_info_.d = {0, 0, 0, 0, 0};
-  camera_info_.k = {1, 0, static_cast<float>(camera_info_.width / 2), 0, 1,
+
+  double f_approx = 1.0;  // FOV equal to 0 disables the approximation
+  if (std::abs(field_of_view_) > std::numeric_limits<double>::epsilon()) {
+    // Based on https://learnopencv.com/approximate-focal-length-for-webcams-and-cell-phone-cameras/
+    f_approx = (camera_info_.width / 2) / std::tan((field_of_view_ * M_PI / 180) / 2);
+  }
+  camera_info_.k = {f_approx, 0, static_cast<float>(camera_info_.width / 2), 0, f_approx,
     static_cast<float>(camera_info_.height / 2), 0, 0, 1};
   camera_info_.r = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-  camera_info_.p = {1, 0, static_cast<float>(camera_info_.width / 2), 0, 0, 1,
+  camera_info_.p = {f_approx, 0, static_cast<float>(camera_info_.width / 2), 0, 0, f_approx,
     static_cast<float>(camera_info_.height / 2), 0, 0, 0, 1, 0};
 
-  timer_ = this->create_wall_timer(
-    std::chrono::milliseconds(static_cast<int>(1000 / publish_rate_)),
-    std::bind(&ImagePublisher::doWork, this));
+  ImagePublisher::reconfigureCallback();
 }
 
 }  // namespace image_publisher

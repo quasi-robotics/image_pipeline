@@ -2,6 +2,9 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.0 (2024-05-27)
+------------------
+
 5.0.1 (2024-03-26)
 ------------------
 * fix image publisher remapping (`#941 <https://github.com/ros-perception/image_pipeline/issues/941>`_)

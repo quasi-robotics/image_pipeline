@@ -14,6 +14,7 @@ Published Topics
 Parameters
 ^^^^^^^^^^
  * **filename** (string, default: ""): Name of image file to be published.
+ * **field_of_view** (double, default: 0): Camera field of view (deg) used to calculate focal length for camera info topic.
  * **flip_horizontal** (bool, default: false): Flip output image horizontally.
  * **flip_vertical** (bool, default: false): Flip output image vertically.
  * **frame_id** (string, default: "camera") Frame id inserted in published

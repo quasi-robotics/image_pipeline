@@ -65,8 +65,10 @@ private:
   rclcpp::Node::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
   std::string filename_;
+  double field_of_view_;
   bool flip_horizontal_;
   bool flip_vertical_;
+  bool image_flipped_;
   bool retry_;  // If enabled will retry loading image from the filename_
   int timeout_;  // Time after which retrying starts
 
