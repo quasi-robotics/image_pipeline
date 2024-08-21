@@ -2,6 +2,23 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.2 (2024-08-20)
+------------------
+* Change camera info message to lower case (backport `#1005 <https://github.com/ros-perception/image_pipeline/issues/1005>`_) (`#1009 <https://github.com/ros-perception/image_pipeline/issues/1009>`_)
+  Change camera info message to lower case since message type had been
+  change in rolling and humble.
+  [](https://github.com/ros2/common_interfaces/blob/rolling/sensor_msgs/msg/CameraInfo.msg)<hr>This
+  is an automatic backport of pull request `#1005 <https://github.com/ros-perception/image_pipeline/issues/1005>`_ done by
+  [Mergify](https://mergify.com).
+  ---------
+  Co-authored-by: SFhmichael <146928033+SFhmichael@users.noreply.github.com>
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* [Iron] Fix aruco dictionary names  (`#971 <https://github.com/ros-perception/image_pipeline/issues/971>`_)
+  There was a aruco dictionary naming issue in `iron`, this seems to be
+  fixed in `rolling`.
+  where the `x` had to be changed to `X`
+* Contributors: Myron Rodrigues, mergify[bot]
+
 4.0.1 (2024-03-26)
 ------------------
 

@@ -2,6 +2,9 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.2 (2024-08-20)
+------------------
+
 4.0.1 (2024-03-26)
 ------------------
 * [backport iron] Node namespace parameter (`#953 <https://github.com/ros-perception/image_pipeline/issues/953>`_)
