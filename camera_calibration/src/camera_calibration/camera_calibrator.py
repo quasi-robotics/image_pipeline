@@ -31,23 +31,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import cv2
-import message_filters
 import numpy
 import os
 import rclpy
-from rclpy.node import Node
-import sensor_msgs.msg
-import sensor_msgs.srv
-import threading
 import time
-from camera_calibration.calibrator import MonoCalibrator, StereoCalibrator, Patterns
+import threading
+import message_filters
+
 try:
     from queue import Queue
 except ImportError:
     from Queue import Queue
-from camera_calibration.calibrator import CAMERA_MODEL
+
+from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
 from rclpy.qos import QoSProfile
+import sensor_msgs.msg
+import sensor_msgs.srv
+
+from camera_calibration.mono_calibrator import MonoCalibrator
+from camera_calibration.stereo_calibrator import StereoCalibrator
+from camera_calibration.calibrator import Patterns, CAMERA_MODEL
 
 
 class BufferQueue(Queue):
@@ -210,14 +214,14 @@ class CalibrationNode(Node):
         for i in range(10):
             print("!" * 80)
         print()
-        print("Attempt to set camera info failed: " + response.result()
-              if response.result() is not None else "Not available")
+        print("Attempt to set camera info failed: " + response.status_message
+              if response.status_message is not None else "Not available")
         print()
         for i in range(10):
             print("!" * 80)
         print()
         self.get_logger().error('Unable to set camera info for calibration. Failure message: %s' %
-                                response.result() if response.result() is not None else "Not available")
+                                response.status_message if response.status_message is not None else "Not available")
         return False
 
     def do_upload(self):

@@ -2,6 +2,47 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.3 (2024-08-20)
+------------------
+* Publish using unique ptr (`#1016 <https://github.com/ros-perception/image_pipeline/issues/1016>`_)
+  Prevents doing an extra copy of the data when using intra-process
+  communication.
+* Finish QoS updates (`#1019 <https://github.com/ros-perception/image_pipeline/issues/1019>`_)
+  This implements the remainder of `#847 <https://github.com/ros-perception/image_pipeline/issues/847>`_:
+  - Make sure publishers default to system defaults (reliable)
+  - Add QoS overriding where possible (some of the image_transport /
+  message_filters stuff doesn't really support that)
+  - Use the matching heuristic for subscribers consistently
+* Contributors: Błażej Sowa, Michael Ferguson
+
+6.0.2 (2024-07-23)
+------------------
+
+6.0.1 (2024-07-22)
+------------------
+* [rolling] image_publisher: Fix loading of the camera info parameters on startup (`#983 <https://github.com/ros-perception/image_pipeline/issues/983>`_)
+  As described in
+  https://github.com/ros-perception/image_pipeline/issues/965 camera info
+  is not loaded from the file on node initialization, but only when the
+  parameter is reloaded.
+  This PR resolves this issue and should be straightforward to port it to
+  `Humble`, `Iron` and `Jazzy`.
+* [rolling] image_publisher: add field of view parameter (`#985 <https://github.com/ros-perception/image_pipeline/issues/985>`_)
+  Currently, the default value for focal length when no camera info is
+  provided defaults to `1.0` rendering whole approximate intrinsics and
+  projection matrices useless. Based on [this
+  article](https://learnopencv.com/approximate-focal-length-for-webcams-and-cell-phone-cameras/),
+  I propose a better approximation of the focal length based on the field
+  of view of the camera.
+  For most of the use cases, users will either know the field of view of
+  the camera the used, or they already calibrated it ahead of time.
+  If there is some documentation to fill. please let me know.
+  This PR should be straightforward to port it to `Humble`, `Iron` and
+  `Jazzy`.
+  ---------
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: Krzysztof Wojciechowski
+
 6.0.0 (2024-05-27)
 ------------------
 * [rolling] image_publisher: Fix image, constantly flipping when static image is published (`#986 <https://github.com/ros-perception/image_pipeline/issues/986>`_)

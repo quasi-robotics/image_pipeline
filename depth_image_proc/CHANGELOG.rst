@@ -2,6 +2,36 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.3 (2024-08-20)
+------------------
+* Publish using unique ptr (`#1016 <https://github.com/ros-perception/image_pipeline/issues/1016>`_)
+  Prevents doing an extra copy of the data when using intra-process
+  communication.
+* Finish QoS updates (`#1019 <https://github.com/ros-perception/image_pipeline/issues/1019>`_)
+  This implements the remainder of `#847 <https://github.com/ros-perception/image_pipeline/issues/847>`_:
+  - Make sure publishers default to system defaults (reliable)
+  - Add QoS overriding where possible (some of the image_transport /
+  message_filters stuff doesn't really support that)
+  - Use the matching heuristic for subscribers consistently
+* fix signature issue from `#943 <https://github.com/ros-perception/image_pipeline/issues/943>`_ (`#1018 <https://github.com/ros-perception/image_pipeline/issues/1018>`_)
+  Without this, we get
+  ```
+  symbol lookup error: /home/ubr/jazzy/install/depth_image_proc/lib/libdepth_image_proc.so: undefined symbol: _ZN16depth_image_proc10convertRgbERKSt10shared_ptrIKN11sensor_msgs3msg6Image_ISaIvEEEES0_INS2_12PointCloud2_IS4_EEEiiii
+  c++filt _ZN16depth_image_proc10convertRgbERKSt10shared_ptrIKN11sensor_msgs3msg6Image_ISaIvEEEES0_INS2_12PointCloud2_IS4_EEEiiii
+  depth_image_proc::convertRgb(std::shared_ptr<sensor_msgs::msg::Image\_<std::allocator<void> > const> const&, std::shared_ptr<sensor_msgs::msg::PointCloud2\_<std::allocator<void> > >, int, int, int, int)
+  ```
+* Contributors: Błażej Sowa, Michael Ferguson
+
+6.0.2 (2024-07-23)
+------------------
+* Removed deprecation warnings (`#1010 <https://github.com/ros-perception/image_pipeline/issues/1010>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.0.1 (2024-07-22)
+------------------
+* Updated deprecated message filter headers (`#1012 <https://github.com/ros-perception/image_pipeline/issues/1012>`_)
+* Contributors: Alejandro Hernández Cordero
+
 6.0.0 (2024-05-27)
 ------------------
 

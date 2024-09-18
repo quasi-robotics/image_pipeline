@@ -262,10 +262,10 @@ void ImageRotateNode::do_work(
     cv::warpAffine(in_image, out_image, rot_matrix, cv::Size(out_size, out_size));
 
     // Publish the image.
-    sensor_msgs::msg::Image::SharedPtr out_img =
-      cv_bridge::CvImage(msg->header, msg->encoding, out_image).toImageMsg();
+    auto out_img = std::make_unique<sensor_msgs::msg::Image>();
+    cv_bridge::CvImage(msg->header, msg->encoding, out_image).toImageMsg(*out_img);
     out_img->header.frame_id = transform.child_frame_id;
-    img_pub_.publish(out_img);
+    img_pub_.publish(std::move(out_img));
   } catch (const cv::Exception & e) {
     RCLCPP_ERROR(
       get_logger(),
@@ -344,6 +344,8 @@ void ImageRotateNode::onInit()
   auto node_base = this->get_node_base_interface();
   std::string topic = node_base->resolve_topic_or_service_name("rotated/image", false);
 
+  // Allow overriding QoS settings (history, depth, reliability)
+  pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
   img_pub_ = image_transport::create_publisher(this, topic, rmw_qos_profile_default, pub_options);
 }
 }  // namespace image_rotate

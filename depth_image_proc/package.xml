@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>depth_image_proc</name>
-  <version>6.0.0</version>
+  <version>6.0.3</version>
   <description>
 
      Contains components for processing depth images such as those
@@ -32,6 +32,7 @@
   <depend>image_geometry</depend>
   <depend>image_transport</depend>
   <depend>libopencv-dev</depend>
+  <depend>image_proc</depend>
   <depend>message_filters</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>

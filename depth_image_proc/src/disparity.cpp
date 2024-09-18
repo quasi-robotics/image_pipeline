@@ -37,8 +37,8 @@
 #include <string>
 
 #include "depth_image_proc/visibility.h"
-#include "message_filters/subscriber.h"
-#include "message_filters/time_synchronizer.h"
+#include "message_filters/subscriber.hpp"
+#include "message_filters/time_synchronizer.hpp"
 
 #include <rclcpp/rclcpp.hpp>
 #include <image_transport/image_transport.hpp>
@@ -77,7 +77,7 @@ private:
   template<typename T>
   void convert(
     const sensor_msgs::msg::Image::ConstSharedPtr & depth_msg,
-    stereo_msgs::msg::DisparityImage::SharedPtr & disp_msg);
+    stereo_msgs::msg::DisparityImage & disp_msg);
 };
 
 DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
@@ -116,18 +116,20 @@ DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
         std::string topic = node_base->resolve_topic_or_service_name("left/image_rect", false);
         image_transport::TransportHints hints(this);
         sub_depth_image_.subscribe(this, topic, hints.getTransport(), rmw_qos_profile_sensor_data);
-        sub_info_.subscribe(this, "right/camera_info");
+        sub_info_.subscribe(this, "right/camera_info", rclcpp::QoS(10));
       }
     };
+  // Allow overriding QoS settings (history, depth, reliability)
+  pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
   pub_disparity_ = create_publisher<stereo_msgs::msg::DisparityImage>(
-    "left/disparity", rclcpp::SensorDataQoS(), pub_options);
+    "left/disparity", rclcpp::SystemDefaultsQoS(), pub_options);
 }
 
 void DisparityNode::depthCb(
   const sensor_msgs::msg::Image::ConstSharedPtr & depth_msg,
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info_msg)
 {
-  auto disp_msg = std::make_shared<DisparityImage>();
+  auto disp_msg = std::make_unique<DisparityImage>();
   disp_msg->header = depth_msg->header;
   disp_msg->image.header = disp_msg->header;
   disp_msg->image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
@@ -144,30 +146,30 @@ void DisparityNode::depthCb(
   disp_msg->delta_d = delta_d_;
 
   if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
-    convert<uint16_t>(depth_msg, disp_msg);
+    convert<uint16_t>(depth_msg, *disp_msg);
   } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
-    convert<float>(depth_msg, disp_msg);
+    convert<float>(depth_msg, *disp_msg);
   } else {
     RCLCPP_ERROR(
       get_logger(), "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
     return;
   }
 
-  pub_disparity_->publish(*disp_msg);
+  pub_disparity_->publish(std::move(disp_msg));
 }
 
 template<typename T>
 void DisparityNode::convert(
   const sensor_msgs::msg::Image::ConstSharedPtr & depth_msg,
-  stereo_msgs::msg::DisparityImage::SharedPtr & disp_msg)
+  stereo_msgs::msg::DisparityImage & disp_msg)
 {
   // For each depth Z, disparity d = fT / Z
   float unit_scaling = DepthTraits<T>::toMeters(T(1) );
-  float constant = disp_msg->f * disp_msg->t / unit_scaling;
+  float constant = disp_msg.f * disp_msg.t / unit_scaling;
 
   const T * depth_row = reinterpret_cast<const T *>(&depth_msg->data[0]);
   int row_step = depth_msg->step / sizeof(T);
-  float * disp_data = reinterpret_cast<float *>(&disp_msg->image.data[0]);
+  float * disp_data = reinterpret_cast<float *>(&disp_msg.image.data[0]);
   for (int v = 0; v < static_cast<int>(depth_msg->height); ++v) {
     for (int u = 0; u < static_cast<int>(depth_msg->width); ++u) {
       T depth = depth_row[u];

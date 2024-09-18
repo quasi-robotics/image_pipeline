@@ -35,11 +35,11 @@
 #include <string>
 
 #include "image_geometry/stereo_camera_model.hpp"
-#include "message_filters/subscriber.h"
-#include "message_filters/synchronizer.h"
-#include "message_filters/sync_policies/approximate_time.h"
-#include "message_filters/sync_policies/approximate_epsilon_time.h"
-#include "message_filters/sync_policies/exact_time.h"
+#include "message_filters/subscriber.hpp"
+#include "message_filters/synchronizer.hpp"
+#include "message_filters/sync_policies/approximate_time.hpp"
+#include "message_filters/sync_policies/approximate_epsilon_time.hpp"
+#include "message_filters/sync_policies/exact_time.hpp"
 #include "rcutils/logging_macros.h"
 
 #include <image_transport/camera_common.hpp>
@@ -180,7 +180,7 @@ PointCloudNode::PointCloudNode(const rclcpp::NodeOptions & options)
           image_transport::getCameraInfoTopic(left_topic), false);
 
         // REP-2003 specifies that subscriber should be SensorDataQoS
-        const auto sensor_data_qos = rclcpp::SensorDataQoS().get_rmw_qos_profile();
+        const auto sensor_data_qos = rclcpp::SensorDataQoS();
 
         // Support image transport for compression
         image_transport::TransportHints hints(this);
@@ -190,10 +190,13 @@ PointCloudNode::PointCloudNode(const rclcpp::NodeOptions & options)
         sub_opts.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
 
         sub_l_image_.subscribe(
-          this, left_topic, hints.getTransport(), sensor_data_qos, sub_opts);
-        sub_l_info_.subscribe(this, left_info_topic, sensor_data_qos, sub_opts);
-        sub_r_info_.subscribe(this, right_topic, sensor_data_qos, sub_opts);
-        sub_disparity_.subscribe(this, disparity_topic, sensor_data_qos, sub_opts);
+          this, left_topic, hints.getTransport(), sensor_data_qos.get_rmw_qos_profile(), sub_opts);
+        sub_l_info_.subscribe(this, left_info_topic,
+          sensor_data_qos, sub_opts);
+        sub_r_info_.subscribe(this, right_topic,
+          sensor_data_qos, sub_opts);
+        sub_disparity_.subscribe(this, disparity_topic,
+          sensor_data_qos, sub_opts);
       }
     };
   pub_points2_ = create_publisher<sensor_msgs::msg::PointCloud2>("points2", 1, pub_opts);
@@ -232,7 +235,7 @@ void PointCloudNode::imageCb(
   cv::Mat_<cv::Vec3f> mat = points_mat_;
 
   // Fill in new PointCloud2 message (2D image-like layout)
-  auto points_msg = std::make_shared<sensor_msgs::msg::PointCloud2>();
+  auto points_msg = std::make_unique<sensor_msgs::msg::PointCloud2>();
   points_msg->header = disp_msg->header;
   points_msg->height = mat.rows;
   points_msg->width = mat.cols;
@@ -348,7 +351,7 @@ void PointCloudNode::imageCb(
     }
   }
 
-  pub_points2_->publish(*points_msg);
+  pub_points2_->publish(std::move(points_msg));
 }
 
 }  // namespace stereo_image_proc

@@ -40,6 +40,7 @@
 
 #include <depth_image_proc/point_cloud_xyz.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <image_proc/utils.hpp>
 #include <image_transport/image_transport.hpp>
 #include <sensor_msgs/image_encodings.hpp>
 #include <depth_image_proc/conversions.hpp>
@@ -75,10 +76,12 @@ PointCloudXyzNode::PointCloudXyzNode(const rclcpp::NodeOptions & options)
         auto node_base = this->get_node_base_interface();
         std::string topic = node_base->resolve_topic_or_service_name("image_rect", false);
 
-        // Get transport and QoS
+        // Get transport hints
         image_transport::TransportHints depth_hints(this, "raw", "depth_image_transport");
-        auto custom_qos = rmw_qos_profile_sensor_data;
-        custom_qos.depth = queue_size_;
+
+        // Create subscriber with QoS matched to subscribed topic publisher
+        auto qos_profile = image_proc::getTopicQosProfile(this, topic);
+        qos_profile.depth = queue_size_;
 
         sub_depth_ = image_transport::create_camera_subscription(
           this,
@@ -87,17 +90,21 @@ PointCloudXyzNode::PointCloudXyzNode(const rclcpp::NodeOptions & options)
             &PointCloudXyzNode::depthCb, this, std::placeholders::_1,
             std::placeholders::_2),
           depth_hints.getTransport(),
-          custom_qos);
+          qos_profile);
       }
     };
-  pub_point_cloud_ = create_publisher<PointCloud2>("points", rclcpp::SensorDataQoS(), pub_options);
+
+  // Allow overriding QoS settings (history, depth, reliability)
+  pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
+  pub_point_cloud_ =
+    create_publisher<PointCloud2>("points", rclcpp::SystemDefaultsQoS(), pub_options);
 }
 
 void PointCloudXyzNode::depthCb(
   const Image::ConstSharedPtr & depth_msg,
   const CameraInfo::ConstSharedPtr & info_msg)
 {
-  const PointCloud2::SharedPtr cloud_msg = std::make_shared<PointCloud2>();
+  auto cloud_msg = std::make_unique<PointCloud2>();
   cloud_msg->header = depth_msg->header;
   cloud_msg->height = depth_msg->height;
   cloud_msg->width = depth_msg->width;
@@ -112,16 +119,16 @@ void PointCloudXyzNode::depthCb(
 
   // Convert Depth Image to Pointcloud
   if (depth_msg->encoding == enc::TYPE_16UC1 || depth_msg->encoding == enc::MONO16) {
-    convertDepth<uint16_t>(depth_msg, cloud_msg, model_, invalid_depth_);
+    convertDepth<uint16_t>(depth_msg, *cloud_msg, model_, invalid_depth_);
   } else if (depth_msg->encoding == enc::TYPE_32FC1) {
-    convertDepth<float>(depth_msg, cloud_msg, model_, invalid_depth_);
+    convertDepth<float>(depth_msg, *cloud_msg, model_, invalid_depth_);
   } else {
     RCLCPP_ERROR(
       get_logger(), "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
     return;
   }
 
-  pub_point_cloud_->publish(*cloud_msg);
+  pub_point_cloud_->publish(std::move(cloud_msg));
 }
 
 }  // namespace depth_image_proc

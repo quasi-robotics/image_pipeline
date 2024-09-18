@@ -1,8 +1,8 @@
 API Documentation
 =================
 
-.. autoclass:: camera_calibration.calibrator.MonoCalibrator
+.. autoclass:: camera_calibration.mono_calibrator.MonoCalibrator
     :members:
 
-.. autoclass:: camera_calibration.calibrator.StereoCalibrator
+.. autoclass:: camera_calibration.stereo_calibrator.StereoCalibrator
     :members:

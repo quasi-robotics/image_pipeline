@@ -84,13 +84,12 @@ DebayerNode::DebayerNode(const rclcpp::NodeOptions & options)
       }
     };
 
-  // Allow overriding QoS settings (history, depth, reliability)
+  // Create publisher - allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
-
-  // Create publisher with QoS matched to subscribed topic publisher
-  auto qos_profile = getTopicQosProfile(this, image_topic_);
-  pub_mono_ = image_transport::create_publisher(this, mono_topic, qos_profile, pub_options);
-  pub_color_ = image_transport::create_publisher(this, color_topic, qos_profile, pub_options);
+  pub_mono_ = image_transport::create_publisher(this, mono_topic, rmw_qos_profile_default,
+      pub_options);
+  pub_color_ = image_transport::create_publisher(this, color_topic, rmw_qos_profile_default,
+      pub_options);
 }
 
 void DebayerNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_msg)
@@ -104,7 +103,7 @@ void DebayerNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_ms
   // First publish to mono if needed
   if (pub_mono_.getNumSubscribers()) {
     if (sensor_msgs::image_encodings::isMono(raw_msg->encoding)) {
-      pub_mono_.publish(raw_msg);
+      pub_mono_.publish(std::move(raw_msg));
     } else {
       if ((bit_depth != 8) && (bit_depth != 16)) {
         RCLCPP_WARN(
@@ -114,18 +113,21 @@ void DebayerNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_ms
       } else {
         // Use cv_bridge to convert to Mono. If a type is not supported,
         // it will error out there
-        sensor_msgs::msg::Image::SharedPtr gray_msg;
+        auto gray_msg = std::make_unique<sensor_msgs::msg::Image>();
+        cv_bridge::CvImagePtr cv_image;
 
         try {
           if (bit_depth == 8) {
-            gray_msg =
-              cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::MONO8)->toImageMsg();
+            cv_image =
+              cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::MONO8);
           } else {
-            gray_msg =
-              cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::MONO16)->toImageMsg();
+            cv_image =
+              cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::MONO16);
           }
 
-          pub_mono_.publish(gray_msg);
+          cv_image->toImageMsg(*gray_msg);
+
+          pub_mono_.publish(std::move(gray_msg));
         } catch (cv_bridge::Exception & e) {
           RCLCPP_WARN(this->get_logger(), "cv_bridge conversion error: '%s'", e.what());
         }
@@ -155,8 +157,7 @@ void DebayerNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_ms
       raw_msg->height, raw_msg->width, CV_MAKETYPE(type, 1),
       const_cast<uint8_t *>(&raw_msg->data[0]), raw_msg->step);
 
-    sensor_msgs::msg::Image::SharedPtr color_msg =
-      std::make_shared<sensor_msgs::msg::Image>();
+    auto color_msg = std::make_unique<sensor_msgs::msg::Image>();
     color_msg->header = raw_msg->header;
     color_msg->height = raw_msg->height;
     color_msg->width = raw_msg->width;
@@ -219,16 +220,17 @@ void DebayerNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_ms
       cv::cvtColor(bayer, color, code);
     }
 
-    pub_color_.publish(color_msg);
+    pub_color_.publish(std::move(color_msg));
   } else if (raw_msg->encoding == sensor_msgs::image_encodings::YUV422 ||  // NOLINT
     raw_msg->encoding == sensor_msgs::image_encodings::YUV422_YUY2)
   {
     // Use cv_bridge to convert to BGR8
-    sensor_msgs::msg::Image::SharedPtr color_msg;
+    auto color_msg = std::make_unique<sensor_msgs::msg::Image>();
 
     try {
-      color_msg = cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::BGR8)->toImageMsg();
-      pub_color_.publish(color_msg);
+      auto cv_image = cv_bridge::toCvCopy(raw_msg, sensor_msgs::image_encodings::BGR8);
+      cv_image->toImageMsg(*color_msg);
+      pub_color_.publish(std::move(color_msg));
     } catch (const cv_bridge::Exception & e) {
       RCLCPP_WARN(this->get_logger(), "cv_bridge conversion error: '%s'", e.what());
     }

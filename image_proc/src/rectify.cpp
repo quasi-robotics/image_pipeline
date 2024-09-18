@@ -81,12 +81,10 @@ RectifyNode::RectifyNode(const rclcpp::NodeOptions & options)
       }
     };
 
-  // Allow overriding QoS settings (history, depth, reliability)
+  // Create publisher - allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
-
-  // Create publisher with QoS matched to subscribed topic publisher
-  auto qos_profile = getTopicQosProfile(this, image_topic_);
-  pub_rect_ = image_transport::create_publisher(this, "image_rect", qos_profile, pub_options);
+  pub_rect_ = image_transport::create_publisher(this, "image_rect", rmw_qos_profile_default,
+      pub_options);
 }
 
 void RectifyNode::imageCb(
@@ -154,9 +152,9 @@ void RectifyNode::imageCb(
   model_.rectifyImage(image, rect, interpolation_);
 
   // Allocate new rectified image message
-  sensor_msgs::msg::Image::SharedPtr rect_msg =
-    cv_bridge::CvImage(image_msg->header, image_msg->encoding, rect).toImageMsg();
-  pub_rect_.publish(rect_msg);
+  auto rect_msg = std::make_unique<sensor_msgs::msg::Image>();
+  cv_bridge::CvImage(image_msg->header, image_msg->encoding, rect).toImageMsg(*rect_msg);
+  pub_rect_.publish(std::move(rect_msg));
 
   TRACEPOINT(
     image_proc_rectify_fini,

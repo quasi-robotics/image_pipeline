@@ -32,14 +32,13 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import rclpy
-import ament_index_python
 import requests
 import unittest
 import tarfile
 import os
 
-from camera_calibration.calibrator import StereoCalibrator, ChessboardInfo, image_from_archive
+from camera_calibration.stereo_calibrator import StereoCalibrator
+from camera_calibration.calibrator import ChessboardInfo, image_from_archive
 
 # Large board used for PR2 calibration
 board = ChessboardInfo()
