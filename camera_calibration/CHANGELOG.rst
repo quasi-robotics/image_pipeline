@@ -2,6 +2,18 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.4 (2024-10-16)
+------------------
+* check_set_camera_info() code clean-up (`#1034 <https://github.com/ros-perception/image_pipeline/issues/1034>`_)
+  Removed the unnecessary `if response.status_message is not None` checks
+  Co-authored-by: ugol-1 <ugol-1@potatomatic.com>
+* Fix `#1032 <https://github.com/ros-perception/image_pipeline/issues/1032>`_ (`#1033 <https://github.com/ros-perception/image_pipeline/issues/1033>`_)
+  Use `status_message` from `SetCameraInfo` response instead of some
+  non-existing `result()`.
+  Fixes `#1032 <https://github.com/ros-perception/image_pipeline/issues/1032>`_
+  Co-authored-by: ugol-1 <ugol-1@potatomatic.com>
+* Contributors: ugol-1
+
 6.0.3 (2024-08-20)
 ------------------
 * Refactoring calibration code (`#1000 <https://github.com/ros-perception/image_pipeline/issues/1000>`_)

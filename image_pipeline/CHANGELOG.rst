@@ -2,6 +2,9 @@
 Changelog for package image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.4 (2024-10-16)
+------------------
+
 6.0.3 (2024-08-20)
 ------------------
 * Finish QoS updates (`#1019 <https://github.com/ros-perception/image_pipeline/issues/1019>`_)

@@ -2,6 +2,9 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.4 (2024-10-16)
+------------------
+
 6.0.3 (2024-08-20)
 ------------------
 * Publish using unique ptr (`#1016 <https://github.com/ros-perception/image_pipeline/issues/1016>`_)
