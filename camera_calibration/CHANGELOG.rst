@@ -2,6 +2,9 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.5 (2024-10-30)
+------------------
+
 6.0.4 (2024-10-16)
 ------------------
 * check_set_camera_info() code clean-up (`#1034 <https://github.com/ros-perception/image_pipeline/issues/1034>`_)
