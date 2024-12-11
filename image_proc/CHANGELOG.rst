@@ -2,6 +2,9 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.6 (2024-12-11)
+------------------
+
 5.0.5 (2024-10-31)
 ------------------
 * Use TF2 package for quaternion conversion (backport `#1031 <https://github.com/ros-perception/image_pipeline/issues/1031>`_) (`#1041 <https://github.com/ros-perception/image_pipeline/issues/1041>`_)
