@@ -2,6 +2,22 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.6 (2024-12-11)
+------------------
+* add image_flip node (`#942 <https://github.com/ros-perception/image_pipeline/issues/942>`_)
+  This is a continuation of
+  https://github.com/ros-perception/image_pipeline/pull/756:
+  * [x] Squashed 16 commits in original PR for ease of rebase/review
+  * [x] Moved node into image_rotate package
+  * [x] Added lazy subscriber
+  * [x] Removes QoS parameters - will add proper QoS overrides in a
+  different PR (when we do the same for image_rotate)
+  * [x] Adds documentation
+  ---------
+  Co-authored-by: David Conner <robotics@cnu.edu>
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: Michael Ferguson
+
 6.0.5 (2024-10-30)
 ------------------
 

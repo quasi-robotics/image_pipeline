@@ -73,6 +73,7 @@ private:
     SEMI_GLOBAL_BLOCK_MATCHING
   };
 
+  bool use_image_transport_camera_info;
   // Subscriptions
   image_transport::SubscriberFilter sub_l_image_, sub_r_image_;
   message_filters::Subscriber<sensor_msgs::msg::CameraInfo> sub_l_info_, sub_r_info_;
@@ -170,6 +171,8 @@ DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
   bool approx = this->declare_parameter("approximate_sync", false);
   double approx_sync_epsilon = this->declare_parameter("approximate_sync_tolerance_seconds", 0.0);
   this->declare_parameter("use_system_default_qos", false);
+  use_image_transport_camera_info = this->declare_parameter("use_image_transport_camera_info",
+      true);
 
   // Synchronize callbacks
   if (approx) {
@@ -307,12 +310,20 @@ DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
         std::string right_topic =
           node_base->resolve_topic_or_service_name("right/image_rect", false);
         // Allow also remapping camera_info to something different than default
-        std::string left_info_topic =
-          node_base->resolve_topic_or_service_name(
-          image_transport::getCameraInfoTopic(left_topic), false);
-        std::string right_info_topic =
-          node_base->resolve_topic_or_service_name(
-          image_transport::getCameraInfoTopic(right_topic), false);
+        std::string left_info_topic;
+        std::string right_info_topic;
+
+        if (use_image_transport_camera_info) {
+          // Use image_transport to derive camera_info topics
+          left_info_topic = node_base->resolve_topic_or_service_name(
+            image_transport::getCameraInfoTopic(left_topic), false);
+          right_info_topic = node_base->resolve_topic_or_service_name(
+            image_transport::getCameraInfoTopic(right_topic), false);
+        } else {
+          // Use default camera_info topics
+          left_info_topic = node_base->resolve_topic_or_service_name("left/camera_info", false);
+          right_info_topic = node_base->resolve_topic_or_service_name("right/camera_info", false);
+        }
 
         // REP-2003 specifies that subscriber should be SensorDataQoS
         const auto sensor_data_qos = rclcpp::SensorDataQoS();

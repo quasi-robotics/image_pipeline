@@ -89,6 +89,9 @@ Parameters
    over the network than camera info and/or the delay from disparity processing
    is too long.
 
+*Common*
+ * **use_image_transport_camera_info** (bool, default: true): To control whether DisparityNode uses image_transport::getCameraInfoTopic for deriving camera_info topics. To set false, the node directly uses the camera_info topics specified via remapping (e.g., left/camera_info and right/camera_info), bypassing image_transport's derivation logic.
+
 stereo_image_proc::PointCloudNode
 ---------------------------------
 Combines a rectified color image and disparity image to produce a
@@ -106,7 +109,7 @@ Subscribed Topics
    image with metadata.
  * **left/camera_info** (sensor_msgs/CameraInfo): Left camera metadata.
  * **left/image_rect_color** (sensor_msgs/Image): Rectified image.
- * **rigtht/camera_info** (sensor_msgs/CameraInfo): Right camera metada.
+ * **right/camera_info** (sensor_msgs/CameraInfo): Right camera metada.
 
 Published Topics
 ^^^^^^^^^^^^^^^^

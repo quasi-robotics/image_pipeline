@@ -2,6 +2,28 @@
 Changelog for package stereo_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.6 (2024-12-11)
+------------------
+* stereo_image_proc: disparity_node: Add parameter to control camera_info (`#1051 <https://github.com/ros-perception/image_pipeline/issues/1051>`_)
+  Add a parameter, use_image_transport_camera_info (default:
+  true), to control whether DisparityNode uses
+  image_transport::getCameraInfoTopic for deriving camera_info topics.
+  Default Behavior (backward compatible):
+  When use_image_transport_camera_info is true, the node continues using
+  image_transport::getCameraInfoTopic for camera_info resolution,
+  maintaining existing functionality.
+  Custom Behavior:
+  When use_image_transport_camera_info is false, the node directly uses
+  the camera_info topics specified via remapping (e.g., left/camera_info
+  and right/camera_info), bypassing image_transport's derivation logic.
+  This solution allows users to explicitly remap the camera_info topics
+  for both cameras, providing flexibility for scenarios where topic names
+  are not unique or need customization.
+  ---------
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Fix spelling error in topic name (`#1049 <https://github.com/ros-perception/image_pipeline/issues/1049>`_)
+* Contributors: Michael Ferguson, quic-zhaoyuan
+
 6.0.5 (2024-10-30)
 ------------------
 

@@ -2,6 +2,20 @@
 Changelog for package image_view
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.6 (2024-12-11)
+------------------
+* `image_view_node`: support bayer images (`#1046 <https://github.com/ros-perception/image_pipeline/issues/1046>`_)
+  so far bayer images always failed with an error:
+  ```
+  [ERROR] [..] [image_view_node]: Unable to convert 'bayer_rggb8' image for display: 'cv_bridge.cvtColorForDisplay() does not have an output encoding                that is color or mono, and has is bit in depth'
+  ```
+  the `stereo_view_node` on the other hand already supports bayer images,
+  however it always forcibly converts them to monochrome, even if they are
+  colour images.
+  for now, this adds the same logic for the single-image viewer and thus
+  only partially resolves `#1045 <https://github.com/ros-perception/image_pipeline/issues/1045>`_.
+* Contributors: Ralph Ursprung
+
 6.0.5 (2024-10-30)
 ------------------
 
