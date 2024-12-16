@@ -130,7 +130,7 @@ void PointCloudXyzrgbNode::connectCb()
     sub_rgb_.subscribe(
       this, "rgb/image_rect_color",
       hints.getTransport(), rmw_qos_profile_sensor_data, sub_opts);
-    sub_info_.subscribe(this, "rgb/camera_info");
+    sub_info_.subscribe(this, "rgb/camera_info", rmw_qos_profile_sensor_data);
   }
 }
 
