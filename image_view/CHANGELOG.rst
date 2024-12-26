@@ -2,6 +2,9 @@
 Changelog for package image_view
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.7 (2024-12-27)
+------------------
+
 6.0.6 (2024-12-11)
 ------------------
 * `image_view_node`: support bayer images (`#1046 <https://github.com/ros-perception/image_pipeline/issues/1046>`_)

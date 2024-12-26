@@ -2,6 +2,15 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.7 (2024-12-27)
+------------------
+* Deprecating tf2 C Headers (`#1039 <https://github.com/ros-perception/image_pipeline/issues/1039>`_)
+  Related to this [pull
+  request](https://github.com/ros2/geometry2/pull/720) in `geometry2` in
+  which we deprecated the `.h` style headers in favor of `.hpp`.
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: Lucas Wendland
+
 6.0.6 (2024-12-11)
 ------------------
 * add image_flip node (`#942 <https://github.com/ros-perception/image_pipeline/issues/942>`_)
