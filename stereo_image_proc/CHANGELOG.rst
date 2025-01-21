@@ -2,6 +2,9 @@
 Changelog for package stereo_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.7 (2024-12-27)
+------------------
+
 6.0.6 (2024-12-11)
 ------------------
 * stereo_image_proc: disparity_node: Add parameter to control camera_info (`#1051 <https://github.com/ros-perception/image_pipeline/issues/1051>`_)
