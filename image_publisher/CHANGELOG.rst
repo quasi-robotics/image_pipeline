@@ -2,6 +2,12 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.7 (2025-02-10)
+------------------
+* Fix Windows compilation in image_publisher.cpp (backport `#1061 <https://github.com/ros-perception/image_pipeline/issues/1061>`_) (`#1062 <https://github.com/ros-perception/image_pipeline/issues/1062>`_)
+  Co-authored-by: Silvio Traversaro <silvio@traversaro.it>
+* Contributors: mergify[bot]
+
 5.0.6 (2024-12-11)
 ------------------
 

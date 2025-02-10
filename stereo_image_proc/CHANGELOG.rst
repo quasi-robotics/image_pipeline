@@ -2,6 +2,9 @@
 Changelog for package stereo_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.7 (2025-02-10)
+------------------
+
 5.0.6 (2024-12-11)
 ------------------
 * Fix spelling error in topic name (backport `#1049 <https://github.com/ros-perception/image_pipeline/issues/1049>`_) (`#1050 <https://github.com/ros-perception/image_pipeline/issues/1050>`_)

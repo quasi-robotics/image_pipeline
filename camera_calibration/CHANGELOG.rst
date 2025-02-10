@@ -2,6 +2,13 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.7 (2025-02-10)
+------------------
+* Check repeatedly (`#1066 <https://github.com/ros-perception/image_pipeline/issues/1066>`_)
+* improve stereo calibration tutorial (backport `#1065 <https://github.com/ros-perception/image_pipeline/issues/1065>`_) (`#1067 <https://github.com/ros-perception/image_pipeline/issues/1067>`_)
+  Co-authored-by: Michael Ferguson <mfergs7@gmail.com>
+* Contributors: Tatsuro Sakaguchi, mergify[bot]
+
 5.0.6 (2024-12-11)
 ------------------
 

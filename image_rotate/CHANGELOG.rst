@@ -2,6 +2,9 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.7 (2025-02-10)
+------------------
+
 5.0.6 (2024-12-11)
 ------------------
 * add image_flip node (backport `#942 <https://github.com/ros-perception/image_pipeline/issues/942>`_) (`#1059 <https://github.com/ros-perception/image_pipeline/issues/1059>`_)
