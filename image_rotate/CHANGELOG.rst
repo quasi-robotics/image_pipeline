@@ -2,6 +2,9 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.8 (2025-02-10)
+------------------
+
 6.0.7 (2024-12-27)
 ------------------
 * Deprecating tf2 C Headers (`#1039 <https://github.com/ros-perception/image_pipeline/issues/1039>`_)

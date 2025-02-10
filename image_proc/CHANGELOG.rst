@@ -2,6 +2,11 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.8 (2025-02-10)
+------------------
+* Removed warning (`#1063 <https://github.com/ros-perception/image_pipeline/issues/1063>`_)
+* Contributors: Alejandro Hernández Cordero
+
 6.0.7 (2024-12-27)
 ------------------
 

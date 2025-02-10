@@ -2,6 +2,15 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.8 (2025-02-10)
+------------------
+* Fix Windows compilation in image_publisher.cpp (`#1061 <https://github.com/ros-perception/image_pipeline/issues/1061>`_)
+  PR https://github.com/ros-perception/image_pipeline/pull/985 added some
+  code that used `M_PI`, but `M_PI` is not defined in any standard, and
+  before including `cmath` or `math.h` in Windows it is necessary to
+  define `_USE_MATH_DEFINES` to ensure that `M_PI` is defined.
+* Contributors: Silvio Traversaro
+
 6.0.7 (2024-12-27)
 ------------------
 
