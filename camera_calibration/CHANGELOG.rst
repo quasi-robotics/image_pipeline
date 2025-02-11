@@ -2,6 +2,21 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.8 (2025-02-10)
+------------------
+* Check repeatedly (backport `#1066 <https://github.com/ros-perception/image_pipeline/issues/1066>`_) (`#1070 <https://github.com/ros-perception/image_pipeline/issues/1070>`_)
+  I made it so that it is checked multiple times instead of just once.
+  - fix `#1052 <https://github.com/ros-perception/image_pipeline/issues/1052>`_
+  Co-authored-by: Tatsuro Sakaguchi <tacchan.mello.ioiq@gmail.com>
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* improve stereo calibration tutorial (`#1065 <https://github.com/ros-perception/image_pipeline/issues/1065>`_)
+  * make topic names consistent by removing the `my\_` prefix on some
+  topics
+  * show the output of `ros2 service list` so that service names are more
+  clear
+  * explain what left/right/left_camera/right_camera actually mean
+* Contributors: Michael Ferguson, mergify[bot]
+
 6.0.7 (2024-12-27)
 ------------------
 
