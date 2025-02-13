@@ -2,6 +2,9 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.9 (2025-02-13)
+------------------
+
 6.0.8 (2025-02-10)
 ------------------
 * Check repeatedly (backport `#1066 <https://github.com/ros-perception/image_pipeline/issues/1066>`_) (`#1070 <https://github.com/ros-perception/image_pipeline/issues/1070>`_)

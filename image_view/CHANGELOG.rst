@@ -2,6 +2,11 @@
 Changelog for package image_view
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.9 (2025-02-13)
+------------------
+* image_view：set CvtColorForDisplay encoding as bgr8 (`#1071 <https://github.com/ros-perception/image_pipeline/issues/1071>`_)
+* Contributors: Zhaoyuan Cheng
+
 6.0.8 (2025-02-10)
 ------------------
 

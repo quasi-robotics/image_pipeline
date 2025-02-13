@@ -2,6 +2,11 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.9 (2025-02-13)
+------------------
+* Fix new opencv aruco api (`#1072 <https://github.com/ros-perception/image_pipeline/issues/1072>`_)
+* Contributors: Bernd Müller
+
 6.0.8 (2025-02-10)
 ------------------
 * Removed warning (`#1063 <https://github.com/ros-perception/image_pipeline/issues/1063>`_)

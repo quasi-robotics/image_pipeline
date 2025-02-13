@@ -2,6 +2,9 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.9 (2025-02-13)
+------------------
+
 6.0.8 (2025-02-10)
 ------------------
 * Fix Windows compilation in image_publisher.cpp (`#1061 <https://github.com/ros-perception/image_pipeline/issues/1061>`_)
