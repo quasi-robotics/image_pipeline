@@ -2,6 +2,11 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.10 (2025-02-27)
+-------------------
+* fix depth_image_proc launch files (`#1077 <https://github.com/ros-perception/image_pipeline/issues/1077>`_)
+* Contributors: Christian Rauch
+
 6.0.9 (2025-02-13)
 ------------------
 
