@@ -2,6 +2,13 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed compilation error (`#1096 <https://github.com/ros-perception/image_pipeline/issues/1096>`_)
+  Related with this issue
+  https://github.com/ros-perception/image_pipeline/issues/1095
+* Contributors: Alejandro Hernández Cordero
+
 6.0.10 (2025-02-27)
 -------------------
 * fix depth_image_proc launch files (`#1077 <https://github.com/ros-perception/image_pipeline/issues/1077>`_)
