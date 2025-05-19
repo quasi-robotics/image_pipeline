@@ -2,8 +2,8 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.0.11 (2025-05-19)
+-------------------
 * Replace OpenCV version string comparison with semver. (`#1087 <https://github.com/ros-perception/image_pipeline/issues/1087>`_)
   When using the ChArUco markers with `cameracalibrator`, I found out that
   there's an issue with the last versions of OpenCV due to the fact that
