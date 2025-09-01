@@ -71,13 +71,14 @@ PointCloudXyzRadialNode::PointCloudXyzRadialNode(const rclcpp::NodeOptions & opt
         auto node_base = this->get_node_base_interface();
         std::string topic = node_base->resolve_topic_or_service_name("depth/image_raw", false);
         // Get transport hints
-        image_transport::TransportHints depth_hints(this, "raw", "depth_image_transport");
+        image_transport::TransportHints depth_hints(*this,
+          "raw", "depth_image_transport");
         // Create subscriber with QoS matched to subscribed topic publisher
         auto qos_profile = image_proc::getQosProfile(this, topic);
         qos_profile.keep_last(queue_size_);
         // Create subscriber
         sub_depth_ = image_transport::create_camera_subscription(
-          this,
+          *this,
           topic,
           std::bind(
             &PointCloudXyzRadialNode::depthCb, this, std::placeholders::_1,

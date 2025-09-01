@@ -312,13 +312,14 @@ void ImageRotateNode::onInit()
         }
 
         // This will check image_transport parameter to get proper transport
-        image_transport::TransportHints transport_hint(this, "raw");
+        image_transport::TransportHints transport_hint(*this,
+          "raw");
 
         if (config_.use_camera_info && config_.input_frame_id.empty()) {
           auto custom_qos = rclcpp::SystemDefaultsQoS();
           custom_qos.keep_last(3);
           cam_sub_ = image_transport::create_camera_subscription(
-            this,
+            *this,
             topic_name,
             std::bind(
               &ImageRotateNode::imageCallbackWithInfo, this,
@@ -329,7 +330,7 @@ void ImageRotateNode::onInit()
           auto custom_qos = rclcpp::SystemDefaultsQoS();
           custom_qos.keep_last(3);
           img_sub_ = image_transport::create_subscription(
-            this,
+            *this,
             topic_name,
             std::bind(&ImageRotateNode::imageCallback, this, std::placeholders::_1),
             transport_hint.getTransport(),
@@ -345,7 +346,7 @@ void ImageRotateNode::onInit()
 
   // Allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
-  img_pub_ = image_transport::create_publisher(this, topic, rclcpp::SystemDefaultsQoS(),
+  img_pub_ = image_transport::create_publisher(*this, topic, rclcpp::SystemDefaultsQoS(),
     pub_options);
 }
 

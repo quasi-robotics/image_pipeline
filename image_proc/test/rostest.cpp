@@ -80,7 +80,7 @@ protected:
     }
 
     // Create raw camera publisher
-    image_transport::ImageTransport it(this->node);
+    image_transport::ImageTransport it{*node};
     cam_pub = it.advertiseCamera(topic_raw, 1);
 
     while (true) {
