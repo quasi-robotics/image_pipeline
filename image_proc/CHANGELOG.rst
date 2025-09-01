@@ -2,6 +2,11 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.1 (2025-09-01)
+------------------
+* Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.1.0 (2025-07-29)
 ------------------
 * Replace rmq_qos_profile_t with rclcpp::QoS (`#1106 <https://github.com/ros-perception/image_pipeline/issues/1106>`_)

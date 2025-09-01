@@ -2,6 +2,9 @@
 Changelog for package image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.1 (2025-09-01)
+------------------
+
 7.1.0 (2025-07-29)
 ------------------
 * Update index.ros.org package website links (`#1101 <https://github.com/ros-perception/image_pipeline/issues/1101>`_)
