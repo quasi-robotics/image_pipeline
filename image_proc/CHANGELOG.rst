@@ -2,6 +2,12 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.2 (2025-09-16)
+------------------
+* Removed unused attribute (`#1117 <https://github.com/ros-perception/image_pipeline/issues/1117>`_)
+* Removed deprecation warning rclcpp::spin_some (`#1118 <https://github.com/ros-perception/image_pipeline/issues/1118>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.1.1 (2025-09-01)
 ------------------
 * Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)

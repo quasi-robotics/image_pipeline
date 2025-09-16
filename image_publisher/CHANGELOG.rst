@@ -2,6 +2,11 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.2 (2025-09-16)
+------------------
+* Fixed image_publisher cmd (`#1115 <https://github.com/ros-perception/image_pipeline/issues/1115>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.1.1 (2025-09-01)
 ------------------
 * Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)
