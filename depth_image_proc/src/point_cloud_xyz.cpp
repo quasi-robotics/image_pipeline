@@ -97,7 +97,7 @@ PointCloudXyzNode::PointCloudXyzNode(const rclcpp::NodeOptions & options)
   // Allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
   pub_point_cloud_ =
-    create_publisher<PointCloud2>("points", rclcpp::SystemDefaultsQoS(), pub_options);
+    create_publisher<PointCloud2>("points", rclcpp::SensorDataQoS(), pub_options);
 }
 
 void PointCloudXyzNode::depthCb(

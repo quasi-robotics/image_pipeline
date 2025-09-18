@@ -90,7 +90,7 @@ PointCloudXyzRadialNode::PointCloudXyzRadialNode(const rclcpp::NodeOptions & opt
   // Allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
   pub_point_cloud_ = create_publisher<sensor_msgs::msg::PointCloud2>(
-    "points", rclcpp::SystemDefaultsQoS(), pub_options);
+    "points", rclcpp::SensorDataQoS(), pub_options);
 }
 
 void PointCloudXyzRadialNode::depthCb(
