@@ -2,6 +2,38 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.2 (2025-09-16)
+------------------
+* Removed warnings in depth_image_proc (`#1116 <https://github.com/ros-perception/image_pipeline/issues/1116>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.1.1 (2025-09-01)
+------------------
+* Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.1.0 (2025-07-29)
+------------------
+* Replace deprecated tf2_ros headers (`#1110 <https://github.com/ros-perception/image_pipeline/issues/1110>`_)
+* Replace rmq_qos_profile_t with rclcpp::QoS (`#1106 <https://github.com/ros-perception/image_pipeline/issues/1106>`_)
+* Update index.ros.org package website links (`#1101 <https://github.com/ros-perception/image_pipeline/issues/1101>`_)
+* Contributors: Alejandro Hernández Cordero, Christophe Bedard
+
+7.0.0 (2025-05-19)
+------------------
+* Fixed compilation error (`#1096 <https://github.com/ros-perception/image_pipeline/issues/1096>`_)
+  Related with this issue
+  https://github.com/ros-perception/image_pipeline/issues/1095
+* Contributors: Alejandro Hernández Cordero
+
+6.0.10 (2025-02-27)
+-------------------
+* fix depth_image_proc launch files (`#1077 <https://github.com/ros-perception/image_pipeline/issues/1077>`_)
+* Contributors: Christian Rauch
+
+6.0.9 (2025-02-13)
+------------------
+
 6.0.8 (2025-02-10)
 ------------------
 

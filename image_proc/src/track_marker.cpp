@@ -65,8 +65,17 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
   // Default dictionary is cv::aruco::DICT_6X6_250
   int dict_id = this->declare_parameter("dictionary", 10);
 
+  #if CV_VERSION_MAJOR > 4 || CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 7
+  detector_params_ = cv::makePtr<cv::aruco::DetectorParameters>();
+  #else
   detector_params_ = cv::aruco::DetectorParameters::create();
+  #endif
+
+  #if CV_VERSION_MAJOR > 4 || CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 7
+  dictionary_ = cv::makePtr<cv::aruco::Dictionary>(cv::aruco::getPredefinedDictionary(dict_id));
+  #else
   dictionary_ = cv::aruco::getPredefinedDictionary(dict_id);
+  #endif
 
   // Setup lazy subscriber using publisher connection callback
   rclcpp::PublisherOptions pub_options;
@@ -77,10 +86,10 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
         sub_camera_.shutdown();
       } else if (!sub_camera_) {
         // Create subscriber with QoS matched to subscribed topic publisher
-        auto qos_profile = getTopicQosProfile(this, image_topic_);
-        image_transport::TransportHints hints(this);
+        auto qos_profile = getQosProfile(this, image_topic_);
+        image_transport::TransportHints hints(*this);
         sub_camera_ = image_transport::create_camera_subscription(
-          this, image_topic_, std::bind(
+          *this, image_topic_, std::bind(
             &TrackMarkerNode::imageCb,
             this, std::placeholders::_1, std::placeholders::_2),
           hints.getTransport(), qos_profile);

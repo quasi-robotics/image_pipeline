@@ -76,13 +76,13 @@ ExtractImagesNode::ExtractImagesNode(const rclcpp::NodeOptions & options)
 
   // TransportHints does not actually declare the parameter
   this->declare_parameter<std::string>("image_transport", "raw");
-  image_transport::TransportHints hints(this);
+  image_transport::TransportHints hints{*this};
   std::string transport = this->get_parameter("transport").as_string();
 
   sub_ = image_transport::create_subscription(
-    this, topic, std::bind(
+    *this, topic, std::bind(
       &ExtractImagesNode::image_cb, this, std::placeholders::_1),
-    hints.getTransport(), rmw_qos_profile_sensor_data);
+    hints.getTransport(), rclcpp::SensorDataQoS());
 
   auto topics = this->get_topic_names_and_types();
 

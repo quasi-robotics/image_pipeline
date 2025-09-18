@@ -2,6 +2,29 @@
 Changelog for package stereo_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.2 (2025-09-16)
+------------------
+
+7.1.1 (2025-09-01)
+------------------
+* Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.1.0 (2025-07-29)
+------------------
+* Replace rmq_qos_profile_t with rclcpp::QoS (`#1106 <https://github.com/ros-perception/image_pipeline/issues/1106>`_)
+* Update index.ros.org package website links (`#1101 <https://github.com/ros-perception/image_pipeline/issues/1101>`_)
+* Contributors: Alejandro Hernández Cordero, Christophe Bedard
+
+7.0.0 (2025-05-19)
+------------------
+
+6.0.10 (2025-02-27)
+-------------------
+
+6.0.9 (2025-02-13)
+------------------
+
 6.0.8 (2025-02-10)
 ------------------
 

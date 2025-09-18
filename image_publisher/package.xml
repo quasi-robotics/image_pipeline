@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>image_publisher</name>
-  <version>6.0.8</version>
+  <version>7.1.2</version>
   <description>
 
       Contains a node publish an image stream from single image file
@@ -17,7 +17,7 @@
   <maintainer email="mfergs7@gmail.com">Michael Ferguson</maintainer>
 
   <license>BSD</license>
-  <url type="website">https://index.ros.org/p/image_publisher/github-ros-perception-image_pipeline/</url>
+  <url type="website">https://index.ros.org/p/image_publisher/</url>
   <url type="bugtracker">https://github.com/ros-perception/image_pipeline/issues</url>
   <url type="repository">https://github.com/ros-perception/image_pipeline</url>
   <author>Kei Okada</author>

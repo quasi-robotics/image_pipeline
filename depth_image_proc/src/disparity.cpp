@@ -95,7 +95,7 @@ DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
   delta_d_ = this->declare_parameter<double>("delta_d", 0.125);
 
   // Synchronize inputs. Topic subscriptions happen on demand in the connection callback.
-  sync_ = std::make_shared<Sync>(sub_depth_image_, sub_info_, queue_size);
+  sync_ = std::make_shared<Sync>(queue_size, sub_depth_image_, sub_info_);
   sync_->registerCallback(
     std::bind(
       &DisparityNode::depthCb, this, std::placeholders::_1, std::placeholders::_2));
@@ -114,8 +114,8 @@ DisparityNode::DisparityNode(const rclcpp::NodeOptions & options)
         // fully expanded and remapped topic name to image_transport
         auto node_base = this->get_node_base_interface();
         std::string topic = node_base->resolve_topic_or_service_name("left/image_rect", false);
-        image_transport::TransportHints hints(this);
-        sub_depth_image_.subscribe(this, topic, hints.getTransport(), rmw_qos_profile_sensor_data);
+        image_transport::TransportHints hints(*this);
+        sub_depth_image_.subscribe(*this, topic, hints.getTransport(), rclcpp::SensorDataQoS());
         sub_info_.subscribe(this, "right/camera_info", rclcpp::QoS(10));
       }
     };

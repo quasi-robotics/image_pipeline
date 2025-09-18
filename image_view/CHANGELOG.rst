@@ -2,6 +2,38 @@
 Changelog for package image_view
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.2 (2025-09-16)
+------------------
+
+7.1.1 (2025-09-01)
+------------------
+* Support image_transport lifecycle (`#1099 <https://github.com/ros-perception/image_pipeline/issues/1099>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.1.0 (2025-07-29)
+------------------
+* Replace rmq_qos_profile_t with rclcpp::QoS (`#1106 <https://github.com/ros-perception/image_pipeline/issues/1106>`_)
+* Update index.ros.org package website links (`#1101 <https://github.com/ros-perception/image_pipeline/issues/1101>`_)
+* Contributors: Alejandro Hernández Cordero, Christophe Bedard
+
+7.0.0 (2025-05-19)
+------------------
+* fix colour channel order for "rgb8" in image_view (`#1093 <https://github.com/ros-perception/image_pipeline/issues/1093>`_)
+  Previously, a `rgb8` encoding was just visualised in RGB colour channel
+  order via OpenCV, which expects colour channel order BGR. Fix this by
+  converting from RGB to BGR.
+* Contributors: Christian Rauch
+
+6.0.10 (2025-02-27)
+-------------------
+* image_view: sleep if no new image (`#1082 <https://github.com/ros-perception/image_pipeline/issues/1082>`_)
+* Contributors: Michael Ferguson
+
+6.0.9 (2025-02-13)
+------------------
+* image_view：set CvtColorForDisplay encoding as bgr8 (`#1071 <https://github.com/ros-perception/image_pipeline/issues/1071>`_)
+* Contributors: Zhaoyuan Cheng
+
 6.0.8 (2025-02-10)
 ------------------
 
