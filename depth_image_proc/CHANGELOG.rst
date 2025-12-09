@@ -2,6 +2,11 @@
 Changelog for package depth_image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.3 (2025-12-09)
+------------------
+* Fix incorrect plugin name for PointCloudXyzrgbRadialNode (`#1120 <https://github.com/ros-perception/image_pipeline//issues/1120>`_)
+* Contributors: mini-1235
+
 7.1.2 (2025-09-16)
 ------------------
 * Removed warnings in depth_image_proc (`#1116 <https://github.com/ros-perception/image_pipeline/issues/1116>`_)
