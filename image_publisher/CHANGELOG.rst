@@ -2,6 +2,9 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.3 (2025-12-09)
+------------------
+
 7.1.2 (2025-09-16)
 ------------------
 * Fixed image_publisher cmd (`#1115 <https://github.com/ros-perception/image_pipeline/issues/1115>`_)
