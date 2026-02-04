@@ -2,6 +2,11 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.4 (2026-01-20)
+------------------
+* Cleanup bsd 3 clause license usage (`#1125 <https://github.com/ros-perception/image_pipeline/issues/1125>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.1.3 (2025-12-09)
 ------------------
 

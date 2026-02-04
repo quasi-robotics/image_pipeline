@@ -2,6 +2,11 @@
 Changelog for package tracetools_image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.4 (2026-01-20)
+------------------
+* Removed warnings (`#1124 <https://github.com/ros-perception/image_pipeline/issues/1124>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.1.3 (2025-12-09)
 ------------------
 
