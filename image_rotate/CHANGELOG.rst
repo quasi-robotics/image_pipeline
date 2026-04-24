@@ -2,6 +2,9 @@
 Changelog for package image_rotate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.5 (2026-04-24)
+------------------
+
 7.1.4 (2026-01-20)
 ------------------
 * Cleanup bsd 3 clause license usage (`#1125 <https://github.com/ros-perception/image_pipeline/issues/1125>`_)
