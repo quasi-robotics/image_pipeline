@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>depth_image_proc</name>
-  <version>6.0.11</version>
+  <version>6.0.12</version>
   <description>
 
      Contains components for processing depth images such as those
@@ -42,6 +42,7 @@
   <depend>tf2_eigen</depend>
   <depend>tf2_ros</depend>
 
+  <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

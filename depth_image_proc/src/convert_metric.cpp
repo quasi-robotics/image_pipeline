@@ -1,33 +1,30 @@
 // Copyright (c) 2008, Willow Garage, Inc.
 // All rights reserved.
 //
-// Software License Agreement (BSD License 2.0)
-//
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
+// modification, are permitted provided that the following conditions are met:
 //
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//  * Neither the name of the Willow Garage nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
@@ -37,6 +34,7 @@
 #include <mutex>
 #include <string>
 
+#include "depth_image_proc/convert_metric.hpp"
 #include "depth_image_proc/visibility.h"
 
 #include <rclcpp/rclcpp.hpp>
@@ -46,22 +44,6 @@
 
 namespace depth_image_proc
 {
-
-class ConvertMetricNode : public rclcpp::Node
-{
-public:
-  DEPTH_IMAGE_PROC_PUBLIC ConvertMetricNode(const rclcpp::NodeOptions & options);
-
-private:
-  // Subscriptions
-  image_transport::Subscriber sub_raw_;
-
-  // Publications
-  std::mutex connect_mutex_;
-  image_transport::Publisher pub_depth_;
-
-  void depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_msg);
-};
 
 ConvertMetricNode::ConvertMetricNode(const rclcpp::NodeOptions & options)
 : Node("ConvertMetricNode", options)
@@ -113,6 +95,17 @@ void ConvertMetricNode::depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & 
 
   // Set data, encoding and step after converting the metric.
   if (raw_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+    const size_t expected_bytes =
+      static_cast<size_t>(raw_msg->height) * static_cast<size_t>(raw_msg->width) *
+      sizeof(uint16_t);
+    if (raw_msg->data.size() < expected_bytes) {
+      RCLCPP_ERROR(
+        get_logger(),
+        "Received malformed 16UC1 image (width=%u, height=%u, data size=%zu, expected >=%zu); "
+        "skipping.",
+        raw_msg->width, raw_msg->height, raw_msg->data.size(), expected_bytes);
+      return;
+    }
     depth_msg->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
     depth_msg->step =
       raw_msg->width * (sensor_msgs::image_encodings::bitDepth(depth_msg->encoding) / 8);
@@ -126,6 +119,17 @@ void ConvertMetricNode::depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & 
       depth_data[index] = (raw == 0) ? bad_point : static_cast<float>(raw * 0.001f);
     }
   } else if (raw_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    const size_t expected_bytes =
+      static_cast<size_t>(raw_msg->height) * static_cast<size_t>(raw_msg->width) *
+      sizeof(float);
+    if (raw_msg->data.size() < expected_bytes) {
+      RCLCPP_ERROR(
+        get_logger(),
+        "Received malformed 32FC1 image (width=%u, height=%u, data size=%zu, expected >=%zu); "
+        "skipping.",
+        raw_msg->width, raw_msg->height, raw_msg->data.size(), expected_bytes);
+      return;
+    }
     depth_msg->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
     depth_msg->step =
       raw_msg->width * (sensor_msgs::image_encodings::bitDepth(depth_msg->encoding) / 8);

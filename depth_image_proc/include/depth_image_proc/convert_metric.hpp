@@ -1,4 +1,4 @@
-// Copyright 2023 Willow Garage, Inc., Michal Wojcik
+// Copyright (c) 2008, Willow Garage, Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,41 +27,36 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IMAGE_PROC__UTILS_HPP_
-#define IMAGE_PROC__UTILS_HPP_
+#ifndef DEPTH_IMAGE_PROC__CONVERT_METRIC_HPP_
+#define DEPTH_IMAGE_PROC__CONVERT_METRIC_HPP_
 
-#include <string>
+#include <mutex>
+
+#include "depth_image_proc/visibility.h"
 
 #include <rclcpp/rclcpp.hpp>
+#include <image_transport/image_transport.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
-namespace image_proc
+namespace depth_image_proc
 {
 
-inline
-rmw_qos_profile_t getTopicQosProfile(rclcpp::Node * node, const std::string & topic)
+class ConvertMetricNode : public rclcpp::Node
 {
-  /**
-   * Given a topic name, get the QoS profile with which it is being published.
-￼  * Replaces history and depth settings with default sensor values since they cannot be retrieved.
-   * @param node pointer to the ROS node
-   * @param topic name of the topic
-   * @returns QoS profile of the publisher to the topic. If there are several publishers, it returns
-   *     returns the profile of the first one on the list. If no publishers exist, it returns
-   *     the sensor data profile.
-   */
-  std::string topic_resolved = node->get_node_base_interface()->resolve_topic_or_service_name(
-    topic, false);
-  auto topics_info = node->get_publishers_info_by_topic(topic_resolved);
-  if (topics_info.size()) {
-    auto profile = topics_info[0].qos_profile().get_rmw_qos_profile();
-    profile.history = rmw_qos_profile_sensor_data.history;
-    profile.depth = rmw_qos_profile_sensor_data.depth;
-    return profile;
-  } else {
-    return rmw_qos_profile_sensor_data;
-  }
-}
+public:
+  DEPTH_IMAGE_PROC_PUBLIC explicit ConvertMetricNode(const rclcpp::NodeOptions & options);
 
-}  // namespace image_proc
+private:
+  // Subscriptions
+  image_transport::Subscriber sub_raw_;
 
-#endif  // IMAGE_PROC__UTILS_HPP_
+  // Publications
+  std::mutex connect_mutex_;
+  image_transport::Publisher pub_depth_;
+
+  void depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & raw_msg);
+};
+
+}  // namespace depth_image_proc
+
+#endif  // DEPTH_IMAGE_PROC__CONVERT_METRIC_HPP_

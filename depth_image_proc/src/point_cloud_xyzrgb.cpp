@@ -1,33 +1,30 @@
 // Copyright (c) 2008, Willow Garage, Inc.
 // All rights reserved.
 //
-// Software License Agreement (BSD License 2.0)
-//
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
+// modification, are permitted provided that the following conditions are met:
 //
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above
-//    copyright notice, this list of conditions and the following
-//    disclaimer in the documentation and/or other materials provided
-//    with the distribution.
-//  * Neither the name of the Willow Garage nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <functional>
@@ -165,6 +162,33 @@ void PointCloudXyzrgbNode::imageCb(
   // Check if the input image has to be resized
   Image::ConstSharedPtr rgb_msg = rgb_msg_in;
   if (depth_msg->width != rgb_msg->width || depth_msg->height != rgb_msg->height) {
+    if (depth_msg->width == 0 || rgb_msg->width == 0 ||
+      depth_msg->height == 0 || rgb_msg->height == 0)
+    {
+      RCLCPP_ERROR(
+        get_logger(),
+        "Invalid image dimensions: depth (%ux%u), rgb (%ux%u)",
+        depth_msg->width, depth_msg->height, rgb_msg->width, rgb_msg->height);
+      return;
+    }
+
+    // Validate that a width-based scale also yields a valid in-bounds row crop
+    // on the RGB image. Otherwise rowRange(...) below would throw cv::Exception
+    // and abort the process. Use integer math equivalent of
+    // (depth_height / ratio) where ratio = depth_width / rgb_width.
+    const uint64_t crop_rows =
+      (static_cast<uint64_t>(depth_msg->height) *
+      static_cast<uint64_t>(rgb_msg->width)) /
+      static_cast<uint64_t>(depth_msg->width);
+    if (crop_rows == 0 || crop_rows > static_cast<uint64_t>(rgb_msg->height)) {
+      RCLCPP_ERROR(
+        get_logger(),
+        "Depth (%ux%u) and RGB (%ux%u) have incompatible aspect ratios; "
+        "cannot derive a valid resize crop. Skipping frame.",
+        depth_msg->width, depth_msg->height, rgb_msg->width, rgb_msg->height);
+      return;
+    }
+
     CameraInfo info_msg_tmp = *info_msg;
     info_msg_tmp.width = depth_msg->width;
     info_msg_tmp.height = depth_msg->height;
@@ -189,9 +213,14 @@ void PointCloudXyzrgbNode::imageCb(
     cv_bridge::CvImage cv_rsz;
     cv_rsz.header = cv_ptr->header;
     cv_rsz.encoding = cv_ptr->encoding;
-    cv::resize(
-      cv_ptr->image.rowRange(0, depth_msg->height / ratio), cv_rsz.image,
-      cv::Size(depth_msg->width, depth_msg->height));
+    try {
+      cv::resize(
+        cv_ptr->image.rowRange(0, static_cast<int>(crop_rows)), cv_rsz.image,
+        cv::Size(depth_msg->width, depth_msg->height));
+    } catch (const cv::Exception & e) {
+      RCLCPP_ERROR(get_logger(), "OpenCV exception while resizing RGB: %s", e.what());
+      return;
+    }
     if ((rgb_msg->encoding == sensor_msgs::image_encodings::RGB8) ||
       (rgb_msg->encoding == sensor_msgs::image_encodings::BGR8) ||
       (rgb_msg->encoding == sensor_msgs::image_encodings::MONO8))
