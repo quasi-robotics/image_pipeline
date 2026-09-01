@@ -2,6 +2,11 @@
 Changelog for package tracetools_image_pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.13 (2026-07-10)
+-------------------
+* Updated CMake minimum version (backport `#1181 <https://github.com/ros-perception/image_pipeline/issues/1181>`_) (`#1191 <https://github.com/ros-perception/image_pipeline/issues/1191>`_)
+* Contributors: mergify[bot]
+
 6.0.12 (2026-04-24)
 -------------------
 

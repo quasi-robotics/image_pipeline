@@ -2,6 +2,12 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.13 (2026-07-10)
+-------------------
+* Updated CMake minimum version (backport `#1181 <https://github.com/ros-perception/image_pipeline/issues/1181>`_) (`#1191 <https://github.com/ros-perception/image_pipeline/issues/1191>`_)
+* Remove Inactive Maintainer
+* Contributors: Josh Whitley, mergify[bot]
+
 6.0.12 (2026-04-24)
 -------------------
 * Cleanup bsd 3 clause license usage (backport `#1125 <https://github.com/ros-perception/image_pipeline/issues/1125>`_) (`#1140 <https://github.com/ros-perception/image_pipeline/issues/1140>`_)

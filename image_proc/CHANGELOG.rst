@@ -2,6 +2,13 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.13 (2026-07-10)
+-------------------
+* Updated CMake minimum version (backport `#1181 <https://github.com/ros-perception/image_pipeline/issues/1181>`_) (`#1191 <https://github.com/ros-perception/image_pipeline/issues/1191>`_)
+* Remove Inactive Maintainer
+* Updated kilted CI (`#1161 <https://github.com/ros-perception/image_pipeline/issues/1161>`_)
+* Contributors: Alejandro Hernández Cordero, Josh Whitley, mergify[bot]
+
 6.0.12 (2026-04-24)
 -------------------
 * Segmentation fault (Null Pointer Dereference) in CropNonZeroNode when processing all-black images (backport `#1134 <https://github.com/ros-perception/image_pipeline/issues/1134>`_) (`#1137 <https://github.com/ros-perception/image_pipeline/issues/1137>`_)
