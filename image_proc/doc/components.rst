@@ -164,7 +164,10 @@ Subscribed Topics
 
 Published Topics
 ^^^^^^^^^^^^^^^^
- * **tracked_pose** (geometry_msgs/PoseStamped): Pose of the marker.
+ * **tracked_pose** (geometry_msgs/PoseStamped): Pose of the marker, one message per
+   detection. Not published if ``publish_pose_array`` is true.
+ * **tracked_poses** (geometry_msgs/PoseArray): Poses of all detections of the marker
+   in an image. Only published if ``publish_pose_array`` is true.
 
 Parameters
 ^^^^^^^^^^
@@ -175,3 +178,6 @@ Parameters
  * **marker_id** (int, default: 0): The ID of the marker to use.
  * **marker_size** (double, default: 0.05): Size of the marker edge,
    in meters.
+ * **publish_pose_array** (bool, default: false): Publish all detections of the
+   marker in an image as a single ``geometry_msgs/PoseArray`` on ``tracked_poses``
+   instead of a ``geometry_msgs/PoseStamped`` per detection on ``tracked_pose``.
