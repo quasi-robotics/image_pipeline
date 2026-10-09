@@ -74,6 +74,7 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
   }
   const bool refine_corners = this->declare_parameter("refine_corners", false);
+  publish_pose_array_ = this->declare_parameter("publish_pose_array", false);
 
   #if CV_VERSION_MAJOR > 4 || CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 7
   detector_params_ = cv::makePtr<cv::aruco::DetectorParameters>();
@@ -95,7 +96,9 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
   pub_options.event_callbacks.matched_callback =
     [this](rclcpp::MatchedInfo &)
     {
-      if (pub_->get_subscription_count() == 0) {
+      const size_t subscription_count = publish_pose_array_ ?
+        pub_array_->get_subscription_count() : pub_->get_subscription_count();
+      if (subscription_count == 0) {
         sub_camera_.shutdown();
       } else if (!sub_camera_) {
         // Create subscriber with QoS matched to subscribed topic publisher
@@ -111,8 +114,13 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
 
   // Create publisher - allow overriding QoS settings (history, depth, reliability)
   pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
-  pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
-    "tracked_pose", 10, pub_options);
+  if (publish_pose_array_) {
+    pub_array_ = this->create_publisher<geometry_msgs::msg::PoseArray>(
+      "tracked_poses", 10, pub_options);
+  } else {
+    pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
+      "tracked_pose", 10, pub_options);
+  }
 
   on_set_parameters_callback_handle_ = this->add_on_set_parameters_callback(
     std::bind(&TrackMarkerNode::paramCallback, this, std::placeholders::_1));
@@ -154,6 +162,9 @@ void TrackMarkerNode::imageCb(
   std::vector<std::vector<cv::Point2f>> marker_corners;
   cv::aruco::detectMarkers(
     cv_ptr->image, dictionary_, marker_corners, marker_ids, detector_params_);
+
+  geometry_msgs::msg::PoseArray pose_array;
+  pose_array.header = image_msg->header;
 
   for (size_t i = 0; i < marker_ids.size(); ++i) {
     if (marker_ids[i] == marker_id_) {
@@ -214,8 +225,16 @@ void TrackMarkerNode::imageCb(
       const tf2::Vector3 rvec(rvecs[0][0], rvecs[0][1], rvecs[0][2]);
       const tf2::Quaternion q(rvec.normalized(), rvec.length());
       tf2::convert(q, pose.pose.orientation);
-      pub_->publish(pose);
+      if (publish_pose_array_) {
+        pose_array.poses.push_back(pose.pose);
+      } else {
+        pub_->publish(pose);
+      }
     }
+  }
+
+  if (publish_pose_array_ && !pose_array.poses.empty()) {
+    pub_array_->publish(pose_array);
   }
 }
 

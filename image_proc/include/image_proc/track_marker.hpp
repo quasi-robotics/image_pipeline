@@ -36,6 +36,7 @@
 #include <string>
 #include <vector>
 
+#include <geometry_msgs/msg/pose_array.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <image_transport/image_transport.hpp>
 #include <opencv2/aruco.hpp>
@@ -72,7 +73,11 @@ private:
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
   std::string image_topic_;
+  // If set, publish all detections of the marker in a frame as one PoseArray on
+  // tracked_poses instead of a PoseStamped per detection on tracked_pose
+  bool publish_pose_array_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr pub_array_;
 
   cv::Ptr<cv::aruco::DetectorParameters> detector_params_;
   cv::Ptr<cv::aruco::Dictionary> dictionary_;
