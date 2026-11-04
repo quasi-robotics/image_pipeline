@@ -2,6 +2,24 @@
 Changelog for package image_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.2 (2026-10-16)
+------------------
+* Export image_publisher symbols on Windows (`#1196 <https://github.com/ros-perception/image_pipeline/issues/1196>`_)
+* Contributors: Daisuke Nishimatsu, Tobias Fischer
+
+8.0.1 (2026-07-10)
+------------------
+* Use std::numbers (`#1171 <https://github.com/ros-perception/image_pipeline/issues/1171>`_)
+* Use lambdas, replace NULL with nullptr and std::format (`#1170 <https://github.com/ros-perception/image_pipeline/issues/1170>`_)
+* Updated CMake minimum version (`#1181 <https://github.com/ros-perception/image_pipeline/issues/1181>`_)
+* Remove Inactive Maintainer
+* Export image_publisher target (`#1178 <https://github.com/ros-perception/image_pipeline/issues/1178>`_)
+* switch to C++20 (`#1165 <https://github.com/ros-perception/image_pipeline/issues/1165>`_)
+* Contributors: Alejandro Hernández Cordero, Christian Rauch, Josh Whitley
+
+8.0.0 (2026-05-08)
+------------------
+
 7.1.5 (2026-04-24)
 ------------------
 

@@ -1,8 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 project(image_view)
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 20)
+endif()
+
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -107,6 +111,10 @@ add_dependencies(video_recorder
 if(BUILD_TESTING)
   find_package(ament_lint_auto)
   ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_auto_add_gtest(test_image_view_node test/test_image_view_node.cpp)
+  target_link_libraries(test_image_view_node ${PROJECT_NAME}_nodes)
 endif()
 
 install(

@@ -70,38 +70,6 @@
 namespace image_view
 {
 
-void ThreadSafeImage::set(cv_bridge::CvImageConstPtr image)
-{
-  std::lock_guard<std::mutex> lock(mutex_);
-  image_ = image;
-  condition_.notify_one();
-}
-
-cv_bridge::CvImageConstPtr ThreadSafeImage::get()
-{
-  std::lock_guard<std::mutex> lock(mutex_);
-  return image_;
-}
-
-cv_bridge::CvImageConstPtr ThreadSafeImage::pop()
-{
-  cv_bridge::CvImageConstPtr image;
-
-  {
-    std::unique_lock<std::mutex> lock(mutex_);
-
-    condition_.wait_for(
-      lock, std::chrono::milliseconds(100),
-      [this] {
-        return !image_;
-      });
-
-    image = std::move(image_);
-  }
-
-  return image;
-}
-
 ImageViewNode::ImageViewNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node("image_view_node", options)
 {
@@ -117,7 +85,8 @@ ImageViewNode::ImageViewNode(const rclcpp::NodeOptions & options)
 
   pub_ = this->create_publisher<sensor_msgs::msg::Image>("output", 1);
   sub_ = image_transport::create_subscription(
-    *this, topic, std::bind(&ImageViewNode::imageCb, this, std::placeholders::_1),
+    *this, topic,
+    [this](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {imageCb(msg);},
     hints.getTransport(), rclcpp::SensorDataQoS());
 
   auto topics = this->get_topic_names_and_types();
@@ -137,7 +106,7 @@ ImageViewNode::ImageViewNode(const rclcpp::NodeOptions & options)
   window_height_ = this->declare_parameter("height", -1);
   window_width_ = this->declare_parameter("width", -1);
   filename_format_ =
-    this->declare_parameter("filename_format", std::string("frame%04i.jpg"));
+    this->declare_parameter("filename_format", std::string("frame{:04}.jpg"));
 
   rcl_interfaces::msg::ParameterDescriptor colormap_paramDescriptor;
   colormap_paramDescriptor.name = "colormap";
@@ -172,11 +141,19 @@ ImageViewNode::ImageViewNode(const rclcpp::NodeOptions & options)
   }
 
   on_set_parameters_callback_handle_ = this->add_on_set_parameters_callback(
-    std::bind(&ImageViewNode::paramCallback, this, std::placeholders::_1));
+    [this](const std::vector<rclcpp::Parameter> & parameters) {
+      return paramCallback(parameters);
+    });
 }
 
 ImageViewNode::~ImageViewNode()
 {
+  {
+    std::lock_guard<std::mutex> lock(image_mutex_);
+    stop_window_thread_ = true;
+  }
+  new_data_available_.notify_all();
+
   if (window_thread_.joinable()) {
     window_thread_.join();
   }
@@ -231,9 +208,15 @@ void ImageViewNode::imageCb(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
       encoding = "bgr8";
     }
 
-    queued_image_.set(
-      cv_bridge::cvtColorForDisplay(
-        cv_bridge::toCvShare(msg), encoding, options));
+    // Convert outside the lock: the conversion can be slow and can throw
+    cv_bridge::CvImageConstPtr image =
+      cv_bridge::cvtColorForDisplay(cv_bridge::toCvShare(msg), encoding, options);
+
+    {
+      std::lock_guard<std::mutex> lock(image_mutex_);
+      queued_image_ = std::move(image);
+    }
+    new_data_available_.notify_one();
   } catch (cv_bridge::Exception & e) {
     RCLCPP_ERROR_EXPRESSION(
       this->get_logger(), (static_cast<int>(this->now().seconds()) % 30 == 0),
@@ -261,14 +244,19 @@ void ImageViewNode::mouseCb(int event, int /* x */, int /* y */, int /* flags */
     return;
   }
 
-  cv_bridge::CvImageConstPtr image(this_->shown_image_.get());
+  // Keep the CvImage (and the message it may share its data with) alive while writing
+  cv_bridge::CvImageConstPtr image;
+  {
+    std::lock_guard<std::mutex> lock(this_->image_mutex_);
+    image = this_->shown_image_;
+  }
 
   if (!image) {
     RCLCPP_WARN(this_->get_logger(), "Couldn't save image, no data!");
     return;
   }
 
-  std::string filename = string_format(this_->filename_format_, this_->count_);
+  const std::string filename = string_format(this_->filename_format_, this_->count_);
 
   if (cv::imwrite(filename, image->image)) {
     RCLCPP_INFO(this_->get_logger(), "Saved image %s", filename.c_str());
@@ -290,25 +278,42 @@ void ImageViewNode::windowThread()
     cv::resizeWindow(window_name_, window_width_, window_height_);
   }
 
-  while (rclcpp::ok()) {
-    cv_bridge::CvImageConstPtr image(queued_image_.pop());
+  while (rclcpp::ok() && !stop_window_thread_) {
+    cv_bridge::CvImageConstPtr image;
+    {
+      std::unique_lock<std::mutex> lock(image_mutex_);
+      // Wake up as soon as a new image is queued or the node is destroyed. The timeout
+      // keeps checking rclcpp::ok() and the window state while no images arrive.
+      new_data_available_.wait_for(
+        lock, std::chrono::milliseconds(100),
+        [this] {return queued_image_ != nullptr || stop_window_thread_;});
+      image = std::move(queued_image_);
+    }
 
+    if (stop_window_thread_) {
+      break;
+    }
+
+    // Check after waiting, so that an image arriving after the user closed the
+    // window does not make imshow() re-create it
     if (cv::getWindowProperty(window_name_, 1) < 0) {
       break;
     }
 
+    // Render without holding the lock, so imageCb() and mouseCb() never wait for it
     if (image) {
       cv::imshow(window_name_, image->image);
-      shown_image_.set(image);
-      cv::waitKey(1);
-    } else {
-      rclcpp::sleep_for(std::chrono::milliseconds(20));
+      std::lock_guard<std::mutex> lock(image_mutex_);
+      shown_image_ = std::move(image);
     }
+    cv::waitKey(1);
   }
 
   cv::destroyAllWindows();
 
-  if (rclcpp::ok()) {
+  // Closing the window shuts the node down, but being destroyed
+  // (e.g. unloaded from a component container) must not
+  if (!stop_window_thread_ && rclcpp::ok()) {
     rclcpp::shutdown();
   }
 }

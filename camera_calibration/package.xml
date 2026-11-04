@@ -2,14 +2,13 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>camera_calibration</name>
-  <version>7.1.5</version>
+  <version>8.0.2</version>
   <description>
      camera_calibration allows easy calibration of monocular or stereo
      cameras using a checkerboard calibration target.
   </description>
 
   <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
-  <maintainer email="whitleysoftwareservices@gmail.com">Joshua Whitley</maintainer>
   <maintainer email="jacob@openrobotics.org">Jacob Perron</maintainer>
   <maintainer email="mfergs7@gmail.com">Michael Ferguson</maintainer>
 

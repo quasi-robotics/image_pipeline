@@ -2,6 +2,20 @@
 Changelog for package camera_calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.2 (2026-10-16)
+------------------
+* Avoid duplicate shutdown after Commit (`#1197 <https://github.com/ros-perception/image_pipeline/issues/1197>`_)
+* Contributors: Igor Stadnyk
+
+8.0.1 (2026-07-10)
+------------------
+* Added flake8 and pep257 to camera calibration (`#1177 <https://github.com/ros-perception/image_pipeline/issues/1177>`_)
+* Remove Inactive Maintainer
+* Contributors: Alejandro Hernández Cordero, Josh Whitley
+
+8.0.0 (2026-05-08)
+------------------
+
 7.1.5 (2026-04-24)
 ------------------
 

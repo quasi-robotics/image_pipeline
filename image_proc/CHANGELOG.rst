@@ -2,6 +2,24 @@
 Changelog for package image_proc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.2 (2026-10-16)
+------------------
+* Export image_proc symbols on Windows (`#1193 <https://github.com/ros-perception/image_pipeline/issues/1193>`_)
+* Contributors: Daisuke Nishimatsu, Tobias Fischer
+
+8.0.1 (2026-07-10)
+------------------
+* Use no discard (`#1176 <https://github.com/ros-perception/image_pipeline/issues/1176>`_)
+* Use lambdas, replace NULL with nullptr and std::format (`#1170 <https://github.com/ros-perception/image_pipeline/issues/1170>`_)
+* Updated CMake minimum version (`#1181 <https://github.com/ros-perception/image_pipeline/issues/1181>`_)
+* Remove Inactive Maintainer
+* switch to C++20 (`#1165 <https://github.com/ros-perception/image_pipeline/issues/1165>`_)
+* Removed the deprecated getTopicQosProfile() function (`#1155 <https://github.com/ros-perception/image_pipeline/issues/1155>`_)
+* Contributors: Alejandro Hernández Cordero, Christian Rauch, Josh Whitley
+
+8.0.0 (2026-05-08)
+------------------
+
 7.1.5 (2026-04-24)
 ------------------
 * Segmentation fault (Null Pointer Dereference) in CropNonZeroNode when processing all-black images (`#1134 <https://github.com/ros-perception/image_pipeline/issues/1134>`_)
