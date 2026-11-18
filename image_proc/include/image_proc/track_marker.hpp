@@ -33,6 +33,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,7 @@
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Transform.hpp>
 #include <tf2_ros/buffer.hpp>
 #include <tf2_ros/transform_listener.hpp>
 
@@ -70,6 +72,11 @@ private:
   std::string vertical_frame_;
   double expected_tilt_;
   double vertical_tilt_margin_;
+  // If > 0, drop detections more than this far (rad) off the heading of bearing_frame_ (x
+  // forward, z up), or of the camera's optical axis when it's empty, e.g. markers of neighbouring
+  // docks; dynamically reconfigurable
+  std::atomic<double> max_bearing_;
+  std::string bearing_frame_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
   std::string image_topic_;
@@ -89,6 +96,12 @@ private:
   // Index of the solution with the expected tilt, or -1 if they can't be told apart
   int chooseTiltSolution(
     const std::vector<cv::Mat> & rvecs, const std_msgs::msg::Header & header);
+
+  // Whether the marker at tvec (camera frame) is within max_bearing_; transform_to_bearing_frame
+  // is looked up on first use and reused for the rest of the image
+  bool withinBearing(
+    const cv::Vec3d & tvec, const std_msgs::msg::Header & header,
+    std::optional<tf2::Transform> & transform_to_bearing_frame);
 
   void imageCb(
     const sensor_msgs::msg::Image::ConstSharedPtr & image_msg,

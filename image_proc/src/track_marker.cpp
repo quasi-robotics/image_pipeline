@@ -32,6 +32,8 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -69,7 +71,13 @@ TrackMarkerNode::TrackMarkerNode(const rclcpp::NodeOptions & options)
   vertical_frame_ = this->declare_parameter("vertical_frame", std::string(""));
   expected_tilt_ = this->declare_parameter("expected_tilt", 0.0);
   vertical_tilt_margin_ = this->declare_parameter("vertical_tilt_margin", 0.05);
-  if (!vertical_frame_.empty()) {
+  const double max_bearing = this->declare_parameter("max_bearing", 0.0);
+  if (max_bearing < 0.0) {
+    throw std::invalid_argument("max_bearing must be >= 0");
+  }
+  max_bearing_ = max_bearing;
+  bearing_frame_ = this->declare_parameter("bearing_frame", std::string(""));
+  if (!vertical_frame_.empty() || !bearing_frame_.empty()) {
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
   }
@@ -141,6 +149,15 @@ rcl_interfaces::msg::SetParametersResult TrackMarkerNode::paramCallback(
       }
       marker_id_ = static_cast<int>(marker_id);
       RCLCPP_INFO(get_logger(), "Tracking marker id %d", marker_id_.load());
+    } else if (parameter.get_name() == "max_bearing") {
+      const double max_bearing = parameter.as_double();
+      if (max_bearing < 0.0) {
+        result.successful = false;
+        result.reason = "max_bearing must be >= 0";
+        return result;
+      }
+      max_bearing_ = max_bearing;
+      RCLCPP_INFO(get_logger(), "Max marker bearing %.3f rad (0 = any)", max_bearing);
     }
   }
   return result;
@@ -165,6 +182,7 @@ void TrackMarkerNode::imageCb(
 
   geometry_msgs::msg::PoseArray pose_array;
   pose_array.header = image_msg->header;
+  std::optional<tf2::Transform> transform_to_bearing_frame;
 
   for (size_t i = 0; i < marker_ids.size(); ++i) {
     if (marker_ids[i] == marker_id_) {
@@ -213,6 +231,9 @@ void TrackMarkerNode::imageCb(
         cv::aruco::estimatePoseSingleMarkers(
           corners, marker_size_, intrinsics, dist_coeffs, rvecs, tvecs);
       }
+      if (!withinBearing(tvecs[0], image_msg->header, transform_to_bearing_frame)) {
+        continue;
+      }
 
       // Publish pose of marker
       geometry_msgs::msg::PoseStamped pose;
@@ -236,6 +257,46 @@ void TrackMarkerNode::imageCb(
   if (publish_pose_array_ && !pose_array.poses.empty()) {
     pub_array_->publish(pose_array);
   }
+}
+
+bool TrackMarkerNode::withinBearing(
+  const cv::Vec3d & tvec, const std_msgs::msg::Header & header,
+  std::optional<tf2::Transform> & transform_to_bearing_frame)
+{
+  const double max_bearing = max_bearing_;
+  if (max_bearing <= 0.0) {
+    return true;
+  }
+  double bearing;
+  if (bearing_frame_.empty()) {
+    // Optical frame: z forward, x right
+    bearing = std::atan2(tvec[0], tvec[2]);
+  } else {
+    if (!transform_to_bearing_frame) {
+      try {
+        // The camera is fixed on the robot, so the latest transform will do
+        tf2::Transform transform;
+        tf2::fromMsg(
+          tf_buffer_->lookupTransform(bearing_frame_, header.frame_id, tf2::TimePointZero).transform,
+          transform);
+        transform_to_bearing_frame = transform;
+      } catch (const tf2::TransformException & ex) {
+        // Better no marker than one of a neighbouring dock
+        RCLCPP_WARN_THROTTLE(
+          this->get_logger(), *this->get_clock(), 5000, "Can't check marker bearing: %s",
+          ex.what());
+        return false;
+      }
+    }
+    const tf2::Vector3 p = *transform_to_bearing_frame * tf2::Vector3(tvec[0], tvec[1], tvec[2]);
+    bearing = std::atan2(p.y(), p.x());
+  }
+  if (std::fabs(bearing) > max_bearing) {
+    RCLCPP_DEBUG(
+      this->get_logger(), "Marker %.3f rad off the heading, dropped", bearing);
+    return false;
+  }
+  return true;
 }
 
 int TrackMarkerNode::chooseTiltSolution(
